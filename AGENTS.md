@@ -50,6 +50,7 @@
 - 記録は `src/lib/progress.ts` に集める。3D 側は着いた・出会ったときに `collect(key, name, points)`・`visit()`・`awaken()`・`addWalk(m)`・`lapArrive()` を呼ぶ。画面（HUD・図鑑・ガチャ）は記録の変化を受けて自動で描き直す
 - 図鑑の key は `ebisu:<id>`（デモの3体）、`cat:<fid>`（828体の一覧）、`sage:<id>`（七賢人）
 - お知らせは `src/lib/ui-store.ts` の `toast(text)`
+- 右下のミニマップ（`src/components/MiniMap.tsx`）はフレーム側（`src/components/ar/MiniMap.tsx` は AR デモの配置図で、別物）。今いる場所は `src/lib/position.ts` に集める。GPS はミニマップが書き、3D 側がデモの位置（地図を押してそこに立ったことにする、など）を出すときは `setPosition(lat, lng, 'demo')` を呼ぶ
 - 「見に行く」（地図の道案内）は 3D／地図側の担当。`BookDialog` の `onGo(fid)` で外に渡す
 
 ### AR のデモ（`/ar-demo`）
@@ -88,7 +89,7 @@
 - フレームワーク: Next.js 16（App Router）+ React 19 + TypeScript
 - ホスティング: Vercel（Fluid Compute、Node.js 24）
 - ローカル開発: Node.js 26.12.0（`.nvmrc` に指定。`nvm use` で切り替える）
-- 地図（3D 側で使う予定）: Leaflet（タイルは国土地理院）、徒歩ルートは OpenStreetMap
+- 地図: Leaflet 1.9.4（タイルは地理院タイル。出典を地図の隅に出す）、徒歩ルートは OpenStreetMap
 - 公開先: https://sagamongo.vercel.app（Vercel の `midnight480` チーム、プロジェクト名 `sagamongo`）
 - 設定ファイル: `vercel.ts`（`@vercel/config`）
 
@@ -110,10 +111,10 @@
 ├── public/figures/      # AR の素材の生成物（<id>/{front,back,side}.png・board.json）
 └── src/
     ├── app/             # ページとレイアウト（layout.tsx / page.tsx / manifest.ts / globals.css）、ar-demo/（AR のデモ）
-    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・BgmButton・PwaRegister・StageSlot（3D の差し込み場所）
+    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・BgmButton・PwaRegister・MiniMap・StageSlot（3D の差し込み場所）
     │   └── ar/          # AR 画面（ARView・SceneObject・FigureBoard・カメラ・位置・デバッグ）
     ├── hooks/           # ブラウザ API の購読（カメラ・端末の向き・位置情報）
-    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）
+    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）・position（今いる場所）
     │   └── ar/          # AR の純粋関数（angle・geo・facing・behaviors（出方・動き方）・objects（定義の読み込み））
     ├── data/            # 試作から移した JSON（ebisu-catalog / ebisu-demo / characters / chapters / events / ranking-demo）、ar-objects.json
     └── styles/          # tokens.css・components.css（design/ から複製）、frame.css（試作 walk.css から移したもの）、ar.css

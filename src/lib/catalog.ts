@@ -41,6 +41,8 @@ export type Entry = {
   address?: string;
   fid?: number;
   located?: boolean;
+  lat?: number; // 位置（ミニマップに出す）
+  lng?: number;
 };
 
 export const CREDIT: string = catalogData.credit;
@@ -73,6 +75,10 @@ export const demoStatues: Entry[] = ebisuDemo.ebisu.map((st) => {
     hint: 'その場所まで行くと集まる',
     photo: cat?.img,
     url: st.officialUrl,
+    fid: fid ?? undefined,
+    located: true,
+    lat: st.lat,
+    lng: st.lng,
   };
 });
 
@@ -95,7 +101,19 @@ export const catalogEntries: Entry[] = catalogData.items.map((it) => ({
   address: it.address,
   fid: it.fid,
   located: Boolean(it.lat),
+  lat: it.lat ?? undefined,
+  lng: it.lng ?? undefined,
 }));
+
+// 地図に出すえびす像：デモの3体と、場所の分かる一覧の像（デモの3体と同じ像は一覧から除く）
+const demoFids = new Set(demoStatues.map((e) => e.fid));
+export const mapStatues: Entry[] = [
+  ...demoStatues,
+  ...catalogEntries.filter((e) => e.located && !demoFids.has(e.fid)),
+];
+
+// 地図の最初の中心（佐賀市柳町付近）
+export const MAP_ORIGIN = { lat: ebisuDemo.observer.lat, lng: ebisuDemo.observer.lng };
 
 // ガチャで出るのはえびす像だけ（七賢人は、えびす像を集めると仲間になる）
 export const gachaPool: Entry[] = [...demoStatues, ...catalogEntries];

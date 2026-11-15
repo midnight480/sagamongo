@@ -53,3 +53,47 @@ html, body { margin: 0; background: var(--color-surface); }
 .thumb-none { display: inline-grid; place-items: center; font-size: var(--font-size-xs); color: var(--color-on-surface-muted); }
 .join-dialog .thumb { margin: 0 auto; animation: gacha-pop 700ms cubic-bezier(0.2, 1.6, 0.4, 1) both; }
 @media (prefers-reduced-motion: reduce) { .join-dialog .thumb { animation: none; } }
+
+/* ---------- 右下の小さな地図（ミニマップ） ---------- */
+.minimap {
+  position: absolute;
+  right: max(var(--space-3), env(safe-area-inset-right));
+  bottom: calc(max(var(--space-3), env(safe-area-inset-bottom)) + var(--space-3));
+  z-index: 2;
+  width: 168px;
+  display: grid;
+  gap: var(--space-1);
+  transition: width var(--duration-base) var(--easing);
+}
+.minimap-map {
+  height: 168px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--elevation-2);
+  transition: height var(--duration-base) var(--easing);
+}
+.minimap.is-expanded { width: min(420px, calc(100vw - 2 * var(--space-3))); }
+.minimap.is-expanded .minimap-map { height: min(420px, 55dvh); }
+.minimap-tools { display: flex; justify-content: flex-end; gap: var(--space-1); }
+.minimap-legend,
+.minimap-note {
+  margin: 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: var(--font-size-xs);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+.minimap-legend i { display: inline-block; width: 10px; height: 10px; margin-right: var(--space-1); border-radius: var(--radius-full); }
+.minimap .leaflet-control-attribution { font-size: 9px; }
+@media (min-width: 640px) {
+  .minimap { width: 220px; }
+  .minimap-map { height: 220px; }
+}
+/* 狭い画面では、左下のポイント表示が地図と重ならないようにする */
+@media (max-width: 639px) {
+  .walk-hud { max-width: calc(100vw - 168px - 3 * var(--space-3)); }
+}
