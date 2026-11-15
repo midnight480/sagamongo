@@ -67,7 +67,6 @@
 - 出方と動き方の種類は `src/lib/ar/behaviors.ts`。種類を足すときは型（`SpawnRule` / `MotionRule`）と表（`SPAWNS` / `MOTIONS`）に 1 つずつ足す
   - spawn: `ahead`（視線の前方）、`geo`（緯度経度。最初の測位で原点が決まってから出る）
   - motion: `wander`（出現地点の周りを歩き回る）、`stay`（立ち止まってこちらを向く）
-- ユーザーの位置は GPS の測位をそのまま使う（`src/components/ar/UserLocomotion.tsx`）。精度での間引きや強い平滑化を入れると、精度の悪い街中で位置が 0,0 から動かなくなる・歩いても距離が縮まない。原点は最初の測位で決め、ページを開き直すまで変えない
 - 二面の素材は、θ < 90° で正面、それ以上で背面。真横から見ても板は進行方向を向いたまま
 - 素材を変えたら `npm run prepare:figure` で `public/figures/<id>/` を作り直し、生成物もコミットする（ビルドでは走らせない）
 - 図鑑とつなぐときは、`objects[].progressKey` に図鑑の key を書き、近づいた・タップしたときに `progress.ts` の関数を呼ぶ形にする（まだ無い）
