@@ -129,3 +129,11 @@ html, body { margin: 0; background: var(--color-surface); }
   pointer-events: none;
 }
 .qr-scan .modal-actions { flex-wrap: wrap; }
+
+/* ---------- 話しかける（えびす像の 30m 以内で押せる） ---------- */
+.walk-talk-button { justify-self: start; max-width: 100%; white-space: normal; text-align: left; }
+.walk-talk-button:disabled { opacity: 0.85; }
+.walk-talk-button.is-active { box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 35%, transparent); animation: walk-talk-pulse 1.6s ease-in-out infinite; }
+@keyframes walk-talk-pulse { 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-primary) 10%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .walk-talk-button.is-active { animation: none; } }
+.walk-talk-photo { display: flex; justify-content: center; margin-bottom: var(--space-3); }

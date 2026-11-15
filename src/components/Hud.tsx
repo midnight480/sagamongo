@@ -7,6 +7,7 @@ import * as progress from '@/lib/progress';
 import { useProgress } from '@/lib/ui-store';
 import { currentEvent } from '@/lib/events';
 import { sages, SAGE_EVERY } from '@/lib/catalog';
+import { TalkButton } from './TalkButton';
 
 export function Hud() {
   const d = useProgress();
@@ -20,6 +21,7 @@ export function Hud() {
 
   return (
     <div className="walk-hud">
+      <TalkButton />
       {ev && (
         <p className="walk-event">
           {ev.name}ブースト中：ポイント{ev.pointsMultiplier}倍

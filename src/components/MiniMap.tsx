@@ -4,6 +4,7 @@
 // ・印の色はレア度（N 灰／R 青／SR 金／SSR 紫）。集めた像は濃く、まだの像は薄く。デモの3体は白い縁で大きく
 // ・印を押すと名前とレア度。「広げる」で大きくなる。「現在地」で今いる場所に戻る
 // ・今いる場所は GPS（許可がなければ柳町付近）。3D 側がデモの位置を lib/position.ts に書けば、それに従う
+// ・デモ：地図を押すと、そこに立ったことにする。像の印を押すと、その像の前に立ったことにする（会場で歩かずに見せるため。GPS には戻らない）
 // 地図：地理院タイル（淡色地図）。Leaflet はブラウザでしか動かないので、開いてから読み込む。
 
 import { useEffect, useRef, useState } from 'react';
@@ -11,6 +12,7 @@ import type * as Leaflet from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as progress from '@/lib/progress';
 import * as position from '@/lib/position';
+import { toast } from '@/lib/ui-store';
 import { mapStatues, MAP_ORIGIN } from '@/lib/catalog';
 import { GRADES } from '@/lib/rarity';
 
@@ -52,6 +54,12 @@ export function MiniMap() {
           fillColor: GRADE_COLOR[e.grade],
           fillOpacity: 0.55,
         }).bindTooltip(`【${e.grade}】${e.name}`, { direction: 'top' }).addTo(m);
+        // デモ：像の印を押すと、その像の前に立ったことにする（「話しかける」は 1.0m 以内なので、地図を押すだけでは届きにくい）
+        mk.on('click', (ev: Leaflet.LeafletMouseEvent) => {
+          L.DomEvent.stopPropagation(ev);
+          position.setPosition(e.lat!, e.lng!, 'demo');
+          toast(`${e.name}の前に立ったことにしました（デモ）`);
+        });
         return { e, mk };
       });
       const paint = () => {
@@ -59,6 +67,12 @@ export function MiniMap() {
       };
       paint();
       cleanups.push(progress.subscribe(paint));
+
+      // デモ：押したところに立ったことにする
+      m.on('click', (ev: Leaflet.LeafletMouseEvent) => {
+        position.setPosition(ev.latlng.lat, ev.latlng.lng, 'demo');
+        toast('ここに立ったことにしました（デモ）');
+      });
 
       // 今いる場所（青い点と、GPS の誤差の輪）
       const me = L.circleMarker([start.lat, start.lng], {
@@ -122,7 +136,7 @@ export function MiniMap() {
           {(Object.keys(GRADE_COLOR) as (keyof typeof GRADE_COLOR)[]).map((g) => (
             <span key={g}><i style={{ background: GRADE_COLOR[g] }} />{g}（{GRADES[g].name}）</span>
           ))}
-          <span>濃い印は集めた像。白い縁はデモの3体</span>
+          <span>濃い印は集めた像。白い縁はデモの3体。地図を押すとそこに、像の印を押すとその像の前に立ったことにできます（デモ）</span>
         </p>
       )}
       {gpsNote && expanded && <p className="minimap-note">{gpsNote}</p>}
