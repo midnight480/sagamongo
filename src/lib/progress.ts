@@ -60,7 +60,8 @@ export type ProgressData = {
   guides: Record<string, string>; // { yanagimachi: 日時 }
   quests: Record<string, QuestRecord>;
   walkM: number; // これまでに歩いた距離（m）
-  gacha: { draws: number; spentYen: number }; // ガチャを回した回数と、払った金額（デモ）
+  // ガチャを回した回数と、払った金額（デモ）。pointDraws・spentPoints は、貯まったポイントで回した分
+  gacha: { draws: number; spentYen: number; pointDraws?: number; spentPoints?: number };
   laps: Record<string, Lap>; // 弾ごとの周回
   party: string[]; // パーティーにいる七賢人の ID（新しい順、最大 PARTY_MAX 人）
   balance: number; // 使えるポイント
@@ -237,6 +238,19 @@ export function buyGacha(yen: number) {
   d().balance += yen;
   log(`ガチャ ${g.draws}回目（¥${yen} デモ決済。累積には入らない）`, yen);
   save();
+}
+
+// 貯まった「使えるポイント」で1回回す。足りなければ何もせず false。
+// 使えるポイントだけ減らし、累積（段位・ランキング）は減らさない
+export function spendPointsForGacha(points: number) {
+  if (d().balance < points) return false;
+  const g = gachaInfo();
+  g.pointDraws = (g.pointDraws ?? 0) + 1;
+  g.spentPoints = (g.spentPoints ?? 0) + points;
+  d().balance -= points;
+  log(`ポイントでガチャ ${g.pointDraws}回目`, -points);
+  save();
+  return true;
 }
 
 // 記念撮影をした。はじめてなら true

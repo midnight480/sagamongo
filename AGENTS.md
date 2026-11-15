@@ -28,6 +28,7 @@
 
 - **ユーザーの写真は端末の中だけに置き、サーバーに送らない。** 保存・共有は本人が押したときだけ
 - **えびす像の写真はリポジトリに保存しない。** 恵比須DEまちづくりネットワークの公式サイトから表示する。一般公開の前に使い方を相談する
+- BGM・効果音は自作（Web Audio で鳴らす）か、権利を確かめたフリー素材だけを使う。使うなら出典とライセンスを README に書く
 - 七賢人の肖像は国立国会図書館「近代日本人の肖像」のものだけを使う。権利を確かめていない画像は置かない
 - 決済はデモ（実際の支払いは起きない）。ほかの参加者・ランキングの相手・案内人は架空でよい。本番の決済を入れるときは Stripe などをサーバー側（Vercel Functions）でつなぐ
 - 会場で歩かずに見せられるよう、デモ用の操作（地図を押してそこに立ったことにする、`?gacha=SSR` などの URL パラメータ）を残す
@@ -50,6 +51,21 @@
 - 図鑑の key は `ebisu:<id>`（デモの3体）、`cat:<fid>`（828体の一覧）、`sage:<id>`（七賢人）
 - お知らせは `src/lib/ui-store.ts` の `toast(text)`
 - 「見に行く」（地図の道案内）は 3D／地図側の担当。`BookDialog` の `onGo(fid)` で外に渡す
+
+### AR のデモ（`/ar-demo`）
+
+`ar-ebisu-sample`（AR の PoC。仕様は同リポジトリの `docs/reimplementation-guide.md`）を移したもの。トップ（`StageSlot`）にはまだつないでいない。
+
+- 置くものは `src/data/ar-objects.json` で決める。2 段に分かれている
+  - `figures`: 素材（見た目）。`views` は面の並び（`["front","back"]` の二面、または `["front","side","back"]` の三面）。元画像は白背景で、左から `views` の順に等幅で並べる
+  - `objects`: 置き方。`figure`（どの素材）、`spawn`（出方）、`motion`（動き方）。同じ素材を何体でも置ける
+- 出方と動き方の種類は `src/lib/ar/behaviors.ts`。種類を足すときは型（`SpawnRule` / `MotionRule`）と表（`SPAWNS` / `MOTIONS`）に 1 つずつ足す
+  - spawn: `ahead`（視線の前方）、`geo`（緯度経度。最初の測位で原点が決まってから出る）
+  - motion: `wander`（出現地点の周りを歩き回る）、`stay`（立ち止まってこちらを向く）
+- 二面の素材は、θ < 90° で正面、それ以上で背面。真横から見ても板は進行方向を向いたまま
+- 素材を変えたら `npm run prepare:figure` で `public/figures/<id>/` を作り直し、生成物もコミットする（ビルドでは走らせない）
+- 図鑑とつなぐときは、`objects[].progressKey` に図鑑の key を書き、近づいた・タップしたときに `progress.ts` の関数を呼ぶ形にする（まだ無い）
+- drei の `<Html>` は、後からマウントするとカメラか位置が動くまで距離に応じた拡大率を当てない。名札は最初からマウントし、表示だけ切り替える
 
 ## 関連リポジトリ
 
@@ -85,17 +101,22 @@
 ├── README.md
 ├── vercel.ts            # Vercel のプロジェクト設定
 ├── next.config.ts       # Next.js の設定（/sw.js のヘッダー）
-├── scripts/             # icon.svg（アイコンの元絵）・make-icons.mjs（PNG を作る）
 ├── public/icons/        # PWA のアイコン
 ├── public/sw.js         # Service Worker。中身を変えたら VERSION を上げる
 ├── .nvmrc               # ローカル開発の Node.js バージョン（nvm 用）
+├── assets/figures/      # AR の素材の元画像（白背景。左から views の順）
+├── scripts/             # prepare-figure.mjs（AR の素材生成。npm run prepare:figure）と lib/、icon.svg・make-icons.mjs（PWA のアイコンを作る）
 ├── public/img/sages/    # 七賢人の肖像（国立国会図書館「近代日本人の肖像」）
+├── public/figures/      # AR の素材の生成物（<id>/{front,back,side}.png・board.json）
 └── src/
-    ├── app/             # ページとレイアウト（layout.tsx / page.tsx / manifest.ts / globals.css）
-    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・PwaRegister・StageSlot（3D の差し込み場所）
-    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store
-    ├── data/            # 試作から移した JSON（ebisu-catalog / ebisu-demo / characters / chapters / events / ranking-demo）
-    └── styles/          # tokens.css・components.css（design/ から複製）、frame.css（試作 walk.css から移したもの）
+    ├── app/             # ページとレイアウト（layout.tsx / page.tsx / manifest.ts / globals.css）、ar-demo/（AR のデモ）
+    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・BgmButton・PwaRegister・StageSlot（3D の差し込み場所）
+    │   └── ar/          # AR 画面（ARView・SceneObject・FigureBoard・カメラ・位置・デバッグ）
+    ├── hooks/           # ブラウザ API の購読（カメラ・端末の向き・位置情報）
+    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）
+    │   └── ar/          # AR の純粋関数（angle・geo・facing・behaviors（出方・動き方）・objects（定義の読み込み））
+    ├── data/            # 試作から移した JSON（ebisu-catalog / ebisu-demo / characters / chapters / events / ranking-demo）、ar-objects.json
+    └── styles/          # tokens.css・components.css（design/ から複製）、frame.css（試作 walk.css から移したもの）、ar.css
 ```
 
 - `src/styles/tokens.css`・`components.css` は `../smart-hackathon-20261115/design/` の複製。元を変えたら合わせて写す
