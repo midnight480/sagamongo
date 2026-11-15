@@ -89,7 +89,16 @@
       "faces": "front",
       "heightM": 1.57,
       "heightNote": "背の高さの記録が見つからないため、幕末の成人男性の平均（約157cm）",
-      "grade": "N"
+      "grade": "N",
+      "portrait": {
+        "src": "img/sages/shima.jpg",
+        "cx": 0.497,
+        "cy": 0.36,
+        "ry": 0.095,
+        "flip": false,
+        "credit": "出典：北海道大学附属図書館 北方資料室所蔵（1868年ごろの写真。Wikimedia Commons、パブリックドメイン）",
+        "url": "https://commons.wikimedia.org/wiki/File:Shima_Yoshitake.jpg"
+      }
     },
     {
       "id": "soejima",
