@@ -109,3 +109,23 @@ html, body { margin: 0; background: var(--color-surface); }
 /* デバッグを開いたら、HUD と地図は隠す（重なって読めなくなるため） */
 .walk.is-ar:has(.ar-debug-body) .walk-hud,
 .walk.is-ar:has(.ar-debug-body) .minimap { visibility: hidden; }
+
+/* ---------- 案内人の QR を読む ---------- */
+.qr-scan-view {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: #000; /* カメラ映像の下地 */
+  aspect-ratio: 3 / 4;
+  max-height: 55dvh;
+  margin: 0 auto var(--space-2);
+}
+.qr-scan-canvas { display: block; width: 100%; height: 100%; object-fit: cover; }
+.qr-scan-frame {
+  position: absolute;
+  inset: 20%;
+  border: 3px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+}
+.qr-scan .modal-actions { flex-wrap: wrap; }

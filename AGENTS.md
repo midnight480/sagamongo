@@ -50,7 +50,7 @@
 - 記録は `src/lib/progress.ts` に集める。3D 側は着いた・出会ったときに `collect(key, name, points)`・`visit()`・`awaken()`・`addWalk(m)`・`lapArrive()` を呼ぶ。画面（HUD・図鑑・ガチャ）は記録の変化を受けて自動で描き直す
 - 図鑑の key は `ebisu:<id>`（デモの3体）、`cat:<fid>`（828体の一覧）、`sage:<id>`（七賢人）
 - お知らせは `src/lib/ui-store.ts` の `toast(text)`
-- 案内人のクイズは AR には出さない。町の案内人（おばあちゃん）に印刷した QR コードを渡し、読み取ると `/guide` → `/?quiz=1` でクイズが出る（行き先は `next.config.ts` の redirects。印刷した QR を作り直さずに変えられる）。印刷用のページは `/qr/guide`
+- 案内人のクイズは AR に人物を置いて出すのではなく、町の案内人（おばあちゃん）に印刷した QR コードを渡し、読み取ると `/guide` → `/?quiz=1` でクイズが出る（行き先は `next.config.ts` の redirects。印刷した QR を作り直さずに変えられる）。印刷用のページは `/qr/guide`。AR 画面のバーの「案内人の QR を読む」（`QrScanDialog`）でも読める。AR がカメラを使っているときは `.ar-video` の映像から読み、カメラを二重に開かない（iPhone で AR の映像が止まるため）。QR の中身の判定は `src/lib/guide-qr.ts`
 - 案内人に出会ったら `src/lib/guide-quiz.ts` の `meetGuide()` を呼ぶ（佐賀の歴史クイズを出す。`meetGuide('okuma')` のように問題の id も渡せる）。問題は `src/data/history-quiz.json`
 - 右下のミニマップ（`src/components/MiniMap.tsx`）はフレーム側（`src/components/ar/MiniMap.tsx` は AR デモの配置図で、別物）。今いる場所は `src/lib/position.ts` に集める。GPS はミニマップが書き、3D 側がデモの位置（地図を押してそこに立ったことにする、など）を出すときは `setPosition(lat, lng, 'demo')` を呼ぶ
 - 「見に行く」（地図の道案内）は 3D／地図側の担当。`BookDialog` の `onGo(fid)` で外に渡す
@@ -115,10 +115,10 @@
 ├── public/figures/      # AR の素材の生成物（<id>/{front,back,side}.png・board.json）
 └── src/
     ├── app/             # ページとレイアウト（layout.tsx / page.tsx / manifest.ts / globals.css）、ar-demo/（AR のデモ）、qr/guide/（案内人に渡す QR コードの印刷用）
-    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・GuideQuizDialog・BgmButton・PwaRegister・MiniMap・StageSlot（3D の差し込み場所）
+    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・GuideQuizDialog・QrScanDialog（案内人の QR を読む）・BgmButton・PwaRegister・MiniMap・StageSlot（3D の差し込み場所）
     │   └── ar/          # AR 画面（ARView・SceneObject・FigureBoard・カメラ・位置・デバッグ）
     ├── hooks/           # ブラウザ API の購読（カメラ・端末の向き・位置情報）
-    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）・guide-quiz（案内人の歴史クイズ）・position（今いる場所）・demo（デモ操作）
+    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）・guide-quiz（案内人の歴史クイズ）・position（今いる場所）・demo（デモ操作）・guide-qr（案内人の QR）
     │   └── ar/          # AR の純粋関数（angle・geo・facing・behaviors（出方・動き方）・objects（定義の読み込み））
     ├── data/            # 試作から移した JSON（ebisu-catalog / ebisu-demo / characters / chapters / events / ranking-demo）、ar-objects.json、history-quiz.json（案内人の歴史クイズ）
     └── styles/          # tokens.css・components.css（design/ から複製）、frame.css（試作 walk.css から移したもの）、ar.css
