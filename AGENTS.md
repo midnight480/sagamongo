@@ -28,6 +28,7 @@
 
 - **ユーザーの写真は端末の中だけに置き、サーバーに送らない。** 保存・共有は本人が押したときだけ
 - **えびす像の写真はリポジトリに保存しない。** 恵比須DEまちづくりネットワークの公式サイトから表示する。一般公開の前に使い方を相談する
+- BGM・効果音は自作（Web Audio で鳴らす）か、権利を確かめたフリー素材だけを使う。使うなら出典とライセンスを README に書く
 - 七賢人の肖像は国立国会図書館「近代日本人の肖像」のものだけを使う。権利を確かめていない画像は置かない
 - 決済はデモ（実際の支払いは起きない）。ほかの参加者・ランキングの相手・案内人は架空でよい。本番の決済を入れるときは Stripe などをサーバー側（Vercel Functions）でつなぐ
 - 会場で歩かずに見せられるよう、デモ用の操作（地図を押してそこに立ったことにする、`?gacha=SSR` などの URL パラメータ）を残す
@@ -88,8 +89,8 @@
 ├── public/img/sages/    # 七賢人の肖像（国立国会図書館「近代日本人の肖像」）
 └── src/
     ├── app/             # ページとレイアウト（layout.tsx / page.tsx / globals.css）
-    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・StageSlot（3D の差し込み場所）
-    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store
+    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・BgmButton・StageSlot（3D の差し込み場所）
+    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）
     ├── data/            # 試作から移した JSON（ebisu-catalog / ebisu-demo / characters / chapters / events / ranking-demo）
     └── styles/          # tokens.css・components.css（design/ から複製）、frame.css（試作 walk.css から移したもの）
 ```
