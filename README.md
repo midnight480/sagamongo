@@ -127,7 +127,7 @@ public/icons/       # アプリのアイコン（scripts/icon.svg から scripts
 public/sw.js        # Service Worker（PWA。画面と静的ファイルを端末に置く）
 public/figures/     # AR の素材（npm run prepare:figure の生成物）
 assets/figures/     # AR の素材の元画像
-scripts/            # 素材の生成スクリプト（AR の素材、PWA のアイコン）
+scripts/            # 素材の生成スクリプト（AR の素材、七賢人の素材の元画像、PWA のアイコン）
 ```
 
 ## 記録とプライバシー
@@ -141,7 +141,7 @@ scripts/            # 素材の生成スクリプト（AR の素材、PWA のア
 
 - えびす像の写真と位置：© 恵比須DEまちづくりネットワーク（公式サイト「佐賀恵比須」）。写真はリポジトリに保存せず、公式サイトから表示しています。一般に公開する前に、使い方を相談します
 - えびす像の名前：公式の一覧で「名称不明」の像（651 体）には、場所（町名・神社や寺）と縁起のよい言葉から仮の名前を付け、「（仮）」を付けています（`src/data/ebisu-catalog.json` の `tentative: true`）。公式の名前ではありません
-- 七賢人の肖像：国立国会図書館「近代日本人の肖像」。島義勇は北海道大学附属図書館 北方資料室所蔵の写真（1868 年ごろ。[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Shima_Yoshitake.jpg)、パブリックドメイン）
+- 七賢人の肖像：国立国会図書館「近代日本人の肖像」。島義勇は北海道大学附属図書館 北方資料室所蔵の写真（1868 年ごろ。[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Shima_Yoshitake.jpg)、パブリックドメイン）。AR の七賢人の素材（`assets/figures/sage-*.png`）は、描いた体にこれらの肖像写真の顔を切り抜いてはめたもの
 - AR の表示：[three.js](https://threejs.org/)（MIT）、[React Three Fiber](https://github.com/pmndrs/react-three-fiber)・[drei](https://github.com/pmndrs/drei)（MIT）。素材の生成に [sharp](https://sharp.pixelplumbing.com/)（Apache-2.0）
 - QR コード：作成に [node-qrcode](https://github.com/soldair/node-qrcode)（MIT）、読み取りに [jsQR](https://github.com/cozmo/jsQR)（Apache-2.0）
 

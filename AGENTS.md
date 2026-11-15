@@ -68,6 +68,7 @@
   - spawn: `ahead`（視線の前方）、`geo`（緯度経度。最初の測位で原点が決まってから出る）
   - motion: `wander`（出現地点の周りを歩き回る）、`stay`（立ち止まってこちらを向く）
 - 二面の素材は、θ < 90° で正面、それ以上で背面。真横から見ても板は進行方向を向いたまま
+- 七賢人の素材は `figures` の `sage-<id>`（正面・横・背面の三面）。`npm run make:sages`（`scripts/make-sage-figures.mjs`）が、描いた体に肖像写真の顔をだ円に切り抜いてはめた元画像を `assets/figures/sage-<id>.png` に作る。横から撮った写真は無いので、横の面も正面の顔写真を左右反転して使う（横顔を作り出さない）。まだ `objects` には置いていない（置き方は 3D 担当が決める）
 - 素材を変えたら `npm run prepare:figure` で `public/figures/<id>/` を作り直し、生成物もコミットする（ビルドでは走らせない）
 - 動作確認用に `/ar-demo?near=0.5` で、動き回るえびすさん（`wander`）を視線の真正面 0.5m に出す（`src/lib/ar/objects.ts` の `withNearSpawn`。`minDistanceM` を 0.5m、`radiusM` を 0.4m にして、1.0m 以内にいるようにする）
 - 図鑑とは、出てくるたびに抽選した像（`drawStatues`。`objects[].progressKey` を書けばその像に固定）でつなぐ。1.0m 以内で「話しかける」と、その像として図鑑に登録する（`src/lib/nearby.ts`）。名札は、図鑑に入っている像ならその名前、まだなら「えびすさん」
@@ -111,7 +112,7 @@
 ├── public/sw.js         # Service Worker。中身を変えたら VERSION を上げる
 ├── .nvmrc               # ローカル開発の Node.js バージョン（nvm 用）
 ├── assets/figures/      # AR の素材の元画像（白背景。左から views の順）
-├── scripts/             # prepare-figure.mjs（AR の素材生成。npm run prepare:figure）と lib/、icon.svg・make-icons.mjs（PWA のアイコンを作る）
+├── scripts/             # prepare-figure.mjs（AR の素材生成。npm run prepare:figure）・make-sage-figures.mjs（七賢人の素材の元画像。npm run make:sages）と lib/、icon.svg・make-icons.mjs（PWA のアイコンを作る）
 ├── public/img/sages/    # 七賢人の肖像（国立国会図書館「近代日本人の肖像」。shima.jpg だけ北海道大学附属図書館 北方資料室所蔵の写真、Wikimedia Commons）
 ├── public/figures/      # AR の素材の生成物（<id>/{front,back,side}.png・board.json）
 └── src/
