@@ -18,6 +18,9 @@ export const PRICES = [300, 250, 200, 150];
 export const RATE: Record<Grade, number> = { N: 60, R: 25, SR: 12, SSR: 3 };
 // かぶったときのおまけ（pt）
 export const DUP_BONUS = 10;
+// 貯まったポイントで回すときの値段（pt）。えびす像を図鑑に入れると N 10pt〜SSR 30pt、現地ボーナス 20pt なので、
+// 像を 3〜4 体集めると 1 回回せるくらい
+export const POINT_PRICE = 100;
 
 export const priceOf = (n: number) => PRICES[Math.min(n, PRICES.length - 1)];
 export const countOf = (g: Grade) => gachaPool.filter((e) => e.grade === g).length;
@@ -43,14 +46,25 @@ export function pick(): Entry {
   return sample(gachaPool.filter((e) => e.grade === grade));
 }
 
-export type DrawResult = { entry: Entry; isNew: boolean; price: number };
+export type DrawResult = { entry: Entry; isNew: boolean; price: number; paidWith: 'yen' | 'points' };
+
+// 1体引いて図鑑に入れる。かぶったらおまけ
+function drawOne() {
+  const entry = pick();
+  const isNew = progress.collect(entry.key, entry.name, 0);
+  if (!isNew) progress.bonus(DUP_BONUS, `ガチャで${entry.name}がかぶった`);
+  return { entry, isNew };
+}
 
 // デモ決済で払って1回引く（記録に残す）。演出は呼んだ側で行う
 export function payAndDraw(): DrawResult {
   const price = priceOf(progress.gachaInfo().draws);
   progress.buyGacha(price);
-  const entry = pick();
-  const isNew = progress.collect(entry.key, entry.name, 0);
-  if (!isNew) progress.bonus(DUP_BONUS, `ガチャで${entry.name}がかぶった`);
-  return { entry, isNew, price };
+  return { ...drawOne(), price, paidWith: 'yen' };
+}
+
+// 貯まったポイントで1回引く。ポイントが足りなければ null
+export function drawWithPoints(): DrawResult | null {
+  if (!progress.spendPointsForGacha(POINT_PRICE)) return null;
+  return { ...drawOne(), price: POINT_PRICE, paidWith: 'points' };
 }
