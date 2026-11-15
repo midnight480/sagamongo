@@ -5,6 +5,8 @@
 // 同じ素材を、出方・動き方を変えて何体でも置ける。
 
 import config from '@/data/ar-objects.json';
+import { gachaPool, type Entry } from '@/lib/catalog';
+import { pick } from '@/lib/gacha';
 import type { MotionRule, SpawnRule } from './behaviors';
 
 export type FigureFace = 'front' | 'side' | 'back';
@@ -28,7 +30,10 @@ export type ARObjectDefinition = {
   figure: FigureDefinition;
   spawn: SpawnRule;
   motion: MotionRule;
-  /** 図鑑（lib/progress.ts）の key。「話しかける」（lib/nearby.ts）で、この像として図鑑に登録する */
+  /**
+   * 図鑑（lib/progress.ts）の key。「話しかける」（lib/nearby.ts）で、この像として図鑑に登録する。
+   * 決まった像にしたいとき（実在の像を geo で置くなど）だけ書く。書かなければ、出てくるたびに図鑑のえびす像から抽選する（drawStatues）
+   */
   progressKey?: string;
 };
 
@@ -89,4 +94,26 @@ export function withNearSpawn(objects: ARObjectDefinition[], nearM: number): ARO
           },
         },
   );
+}
+
+const entryByKey = new Map(gachaPool.map((e) => [e.key, e]));
+/** 同じ画面に同じ像が重なったときに引き直す回数 */
+const REDRAW = 5;
+
+/**
+ * 各オブジェクトがどの図鑑の像かを決める。AR の開始時と「出し直す」のときに呼ぶ。
+ * progressKey があればその像、無ければガチャと同じ確率（lib/gacha.ts の pick）で 1 体を引く。
+ * 同じ画面に同じ像が重ならないよう、重なったら数回引き直す
+ */
+export function drawStatues(objects: ARObjectDefinition[]): Record<string, Entry> {
+  const used = new Set<string>();
+  const out: Record<string, Entry> = {};
+  for (const o of objects) {
+    const fixed = o.progressKey ? entryByKey.get(o.progressKey) : undefined;
+    let e = fixed ?? pick();
+    for (let i = 0; !fixed && used.has(e.key) && i < REDRAW; i++) e = pick();
+    used.add(e.key);
+    out[o.id] = e;
+  }
+  return out;
 }

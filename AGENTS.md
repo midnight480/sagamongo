@@ -53,7 +53,7 @@
 - 案内人のクイズは AR に人物を置いて出すのではなく、町の案内人（おばあちゃん）に印刷した QR コードを渡し、読み取ると `/guide` → `/?quiz=1` でクイズが出る（行き先は `next.config.ts` の redirects。印刷した QR を作り直さずに変えられる）。印刷用のページは `/qr/guide`。AR 画面のバーの「案内人の QR を読む」（`QrScanDialog`）でも読める。AR がカメラを使っているときは `.ar-video` の映像から読み、カメラを二重に開かない（iPhone で AR の映像が止まるため）。QR の中身の判定は `src/lib/guide-qr.ts`
 - 案内人に出会ったら `src/lib/guide-quiz.ts` の `meetGuide()` を呼ぶ（佐賀の歴史クイズを出す。`meetGuide('okuma')` のように問題の id も渡せる）。問題は `src/data/history-quiz.json`
 - 右下のミニマップ（`src/components/MiniMap.tsx`）はフレーム側（`src/components/ar/MiniMap.tsx` は AR デモの配置図で、別物）。今いる場所は `src/lib/position.ts` に集める。GPS はミニマップが書き、3D 側がデモの位置（地図を押してそこに立ったことにする、など）を出すときは `setPosition(lat, lng, 'demo')` を呼ぶ
-- 「話しかける」（`src/components/TalkButton.tsx`、HUD のいちばん上）：相手は **AR の画面に出ているえびすさん**。`ARView` が、各えびすさんとユーザーの水平距離（`SceneObject` が毎フレーム `debugRef` に書く値）を 150ms ごとに `src/lib/nearby.ts` の `report()` へ知らせ、いちばん近いえびすさんが **1.0m 以内**なら押せる。ボタンはいつも出しておき、ふだんは押せない（AR の前は案内、AR 中は名前と距離）。押すとひとことを出し、`ar-objects.json` の `objects[].progressKey`（今は `ebisu-walk` → `ebisu:yasaka`、`ebisu-stay` → `ebisu:houtomi`）の像として、はじめてなら図鑑に登録（レア度のポイント）と現地ボーナス +20pt
+- 「話しかける」（`src/components/TalkButton.tsx`、HUD のいちばん上）：相手は **AR の画面に出ているえびすさん**。`ARView` が、各えびすさんとユーザーの水平距離（`SceneObject` が毎フレーム `debugRef` に書く値）を 150ms ごとに `src/lib/nearby.ts` の `report()` へ知らせ、いちばん近いえびすさんが **1.0m 以内**なら押せる。ボタンはいつも出しておき、ふだんは押せない（AR の前は案内、AR 中は名前と距離）。押すとひとことを出し、そのえびすさんに割り当てた像（出てくるとき＝AR の開始時と「出し直す」のときに、`src/lib/ar/objects.ts` の `drawStatues` がガチャと同じ確率で図鑑のえびす像から抽選する。`ar-objects.json` に `progressKey` を書いた物体だけはその像に固定）として、はじめてなら図鑑に登録（レア度のポイント）と現地ボーナス +20pt
 - 「見に行く」（地図の道案内）は 3D／地図側の担当。`BookDialog` の `onGo(fid)` で外に渡す
 
 ### AR のデモ（`/ar-demo`）
@@ -70,7 +70,7 @@
 - 二面の素材は、θ < 90° で正面、それ以上で背面。真横から見ても板は進行方向を向いたまま
 - 素材を変えたら `npm run prepare:figure` で `public/figures/<id>/` を作り直し、生成物もコミットする（ビルドでは走らせない）
 - 動作確認用に `/ar-demo?near=0.5` で、動き回るえびすさん（`wander`）を視線の真正面 0.5m に出す（`src/lib/ar/objects.ts` の `withNearSpawn`。`minDistanceM` を 0.5m、`radiusM` を 0.4m にして、1.0m 以内にいるようにする）
-- 図鑑とは `objects[].progressKey`（図鑑の key）でつなぐ。1.0m 以内で「話しかける」と、その像として図鑑に登録する（`src/lib/nearby.ts`）
+- 図鑑とは、出てくるたびに抽選した像（`drawStatues`。`objects[].progressKey` を書けばその像に固定）でつなぐ。1.0m 以内で「話しかける」と、その像として図鑑に登録する（`src/lib/nearby.ts`）。名札は、図鑑に入っている像ならその名前、まだなら「えびすさん」
 - drei の `<Html>` は、後からマウントするとカメラか位置が動くまで距離に応じた拡大率を当てない。名札は最初からマウントし、表示だけ切り替える
 
 ## 関連リポジトリ
