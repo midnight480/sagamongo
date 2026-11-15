@@ -4,7 +4,7 @@
 // 移植元: ar-ebisu-sample/components/ar/ARView.tsx（定義の配列を受け取り、何体でも並べられるようにした）
 
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useRef, useState, type PointerEvent } from "react";
+import { Suspense, useEffect, useRef, useState, type PointerEvent } from "react";
 import { useCameraStream } from "@/hooks/useCameraStream";
 import { useDeviceOrientation } from "@/hooks/useDeviceOrientation";
 import { useGeolocation } from "@/hooks/useGeolocation";
@@ -17,6 +17,10 @@ import { OrientationCamera } from "./OrientationCamera";
 import { SceneObject } from "./SceneObject";
 import { createDebugInfo, createUserState, type DebugInfo, type DragLook, type UserState } from "./types";
 import { UserLocomotion } from "./UserLocomotion";
+import * as nearby from "@/lib/nearby";
+
+/** 「話しかける」（フレーム側）に、えびすさんとの距離を知らせる間隔（ms） */
+const NEARBY_INTERVAL_MS = 150;
 
 const DRAG_SENSITIVITY = 0.005;
 const MAX_PITCH = Math.PI / 2 - 0.05;
@@ -44,6 +48,25 @@ export default function ARView({ objects, title }: Props) {
   const userRef = useRef<UserState>(createUserState());
   const dragRef = useRef<DragLook>({ yaw: 0, pitch: -0.25 });
   const lastPointer = useRef<{ x: number; y: number } | null>(null);
+
+  // フレーム側の「話しかける」ボタンに、各えびすさんとの水平距離（SceneObject が毎フレーム debugRef に書く値）を知らせる
+  useEffect(() => {
+    if (!started) return;
+    const id = setInterval(() => {
+      const info = debugRef.current.objects;
+      nearby.report(objects.map((o) => ({
+        id: o.id,
+        label: o.label,
+        progressKey: o.progressKey,
+        spawned: Boolean(info[o.id]?.spawned),
+        distM: info[o.id]?.distance ?? Infinity,
+      })));
+    }, NEARBY_INTERVAL_MS);
+    return () => {
+      clearInterval(id);
+      nearby.clear();
+    };
+  }, [started, objects]);
 
   const handleStart = async () => {
     // iOS では、タップのハンドラ内で await する前に許可の要求を始める必要がある

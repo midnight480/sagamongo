@@ -53,7 +53,7 @@
 - 案内人のクイズは AR に人物を置いて出すのではなく、町の案内人（おばあちゃん）に印刷した QR コードを渡し、読み取ると `/guide` → `/?quiz=1` でクイズが出る（行き先は `next.config.ts` の redirects。印刷した QR を作り直さずに変えられる）。印刷用のページは `/qr/guide`。AR 画面のバーの「案内人の QR を読む」（`QrScanDialog`）でも読める。AR がカメラを使っているときは `.ar-video` の映像から読み、カメラを二重に開かない（iPhone で AR の映像が止まるため）。QR の中身の判定は `src/lib/guide-qr.ts`
 - 案内人に出会ったら `src/lib/guide-quiz.ts` の `meetGuide()` を呼ぶ（佐賀の歴史クイズを出す。`meetGuide('okuma')` のように問題の id も渡せる）。問題は `src/data/history-quiz.json`
 - 右下のミニマップ（`src/components/MiniMap.tsx`）はフレーム側（`src/components/ar/MiniMap.tsx` は AR デモの配置図で、別物）。今いる場所は `src/lib/position.ts` に集める。GPS はミニマップが書き、3D 側がデモの位置（地図を押してそこに立ったことにする、など）を出すときは `setPosition(lat, lng, 'demo')` を呼ぶ
-- 「話しかける」（`src/components/TalkButton.tsx`、HUD のいちばん上）：今いる場所といちばん近いえびす像の距離を、位置が変わるたびに計算し（`src/lib/nearby.ts`）、**1.0m 以内**で押せるようになる。押すとえびすさんのひとことを出し、はじめてなら図鑑に登録（レア度のポイント）と現地ボーナス +20pt。デモでは、ミニマップの像の印を押すとその像の前に立ったことにできる（地図のほかの場所を押すと、そこに立ったことにする）
+- 「話しかける」（`src/components/TalkButton.tsx`、HUD のいちばん上）：相手は **AR の画面に出ているえびすさん**。`ARView` が、各えびすさんとユーザーの水平距離（`SceneObject` が毎フレーム `debugRef` に書く値）を 150ms ごとに `src/lib/nearby.ts` の `report()` へ知らせ、いちばん近いえびすさんが **1.0m 以内**なら押せる。ボタンはいつも出しておき、ふだんは押せない（AR の前は案内、AR 中は名前と距離）。押すとひとことを出し、`ar-objects.json` の `objects[].progressKey`（今は `ebisu-walk` → `ebisu:yasaka`、`ebisu-stay` → `ebisu:houtomi`）の像として、はじめてなら図鑑に登録（レア度のポイント）と現地ボーナス +20pt
 - 「見に行く」（地図の道案内）は 3D／地図側の担当。`BookDialog` の `onGo(fid)` で外に渡す
 
 ### AR のデモ（`/ar-demo`）
@@ -70,7 +70,7 @@
 - ユーザーの位置は GPS の測位をそのまま使う（`src/components/ar/UserLocomotion.tsx`）。精度での間引きや強い平滑化を入れると、精度の悪い街中で位置が 0,0 から動かなくなる・歩いても距離が縮まない。原点は最初の測位で決め、ページを開き直すまで変えない
 - 二面の素材は、θ < 90° で正面、それ以上で背面。真横から見ても板は進行方向を向いたまま
 - 素材を変えたら `npm run prepare:figure` で `public/figures/<id>/` を作り直し、生成物もコミットする（ビルドでは走らせない）
-- 図鑑とつなぐときは、`objects[].progressKey` に図鑑の key を書き、近づいた・タップしたときに `progress.ts` の関数を呼ぶ形にする（まだ無い）
+- 図鑑とは `objects[].progressKey`（図鑑の key）でつなぐ。1.0m 以内で「話しかける」と、その像として図鑑に登録する（`src/lib/nearby.ts`）
 - drei の `<Html>` は、後からマウントするとカメラか位置が動くまで距離に応じた拡大率を当てない。名札は最初からマウントし、表示だけ切り替える
 
 ## 関連リポジトリ
@@ -119,7 +119,7 @@
     ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・GuideQuizDialog・QrScanDialog（案内人の QR を読む）・TalkButton（話しかける）・BgmButton・PwaRegister・MiniMap・StageSlot（3D の差し込み場所）
     │   └── ar/          # AR 画面（ARView・SceneObject・FigureBoard・カメラ・位置・デバッグ）
     ├── hooks/           # ブラウザ API の購読（カメラ・端末の向き・位置情報）
-    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）・guide-quiz（案内人の歴史クイズ）・position（今いる場所）・demo（デモ操作）・guide-qr（案内人の QR）・nearby（近くのえびす像・話しかける）
+    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）・guide-quiz（案内人の歴史クイズ）・position（今いる場所）・demo（デモ操作）・guide-qr（案内人の QR）・nearby（AR のえびすさんとの距離・話しかける）
     │   └── ar/          # AR の純粋関数（angle・geo・facing・behaviors（出方・動き方）・objects（定義の読み込み））
     ├── data/            # 試作から移した JSON（ebisu-catalog / ebisu-demo / characters / chapters / events / ranking-demo）、ar-objects.json、history-quiz.json（案内人の歴史クイズ）
     └── styles/          # tokens.css・components.css（design/ から複製）、frame.css（試作 walk.css から移したもの）、ar.css

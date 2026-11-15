@@ -28,7 +28,7 @@ export type ARObjectDefinition = {
   figure: FigureDefinition;
   spawn: SpawnRule;
   motion: MotionRule;
-  /** 図鑑（lib/progress.ts）の key。記録とつなぐときに使う（今は未使用） */
+  /** 図鑑（lib/progress.ts）の key。「話しかける」（lib/nearby.ts）で、この像として図鑑に登録する */
   progressKey?: string;
 };
 

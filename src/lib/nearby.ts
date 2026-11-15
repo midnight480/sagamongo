@@ -1,13 +1,13 @@
-// 今いる場所からいちばん近いえびす像。1.0m 以内なら「話しかける」を押せる。
-// 今いる場所とえびす像の距離は、位置が変わるたびに計算し直している。
-// 仕様（ebisu-walk.md）：像のすぐそば（1.0m 以内）まで近づくと「話しかける」を押せ、話しかけると図鑑に登録し、ポイントがもらえる
-//   図鑑に登録：レア度に応じたポイント（ガチャで持っていた像はなし）／現地ボーナス：はじめて行ったとき +20pt
-// 今いる場所は lib/position.ts（GPS か、デモの位置）。
+// 「話しかける」の相手：AR の画面に出ているえびすさん（src/data/ar-objects.json の objects）。
+// AR 画面（components/ar/ARView.tsx）が、ユーザーと各えびすさんの水平距離（3D シーンで毎フレーム計算している値）を
+// ここに知らせる。いちばん近いえびすさんまで 1.0m 以内なら「話しかける」を押せる。
+// 仕様（ebisu-walk.md）：えびすさんのすぐそば（1.0m 以内）まで近づくと「話しかける」を押せ、話しかけると図鑑に登録し、ポイントがもらえる
+//   図鑑に登録：レア度に応じたポイント（ガチャで持っていた像はなし）／現地ボーナス：はじめてのとき +20pt
+//   どの図鑑の像として数えるかは、ar-objects.json の objects[].progressKey（例 'ebisu:yasaka'）。無ければ、ひとことだけ
 
-import * as position from './position';
 import * as progress from './progress';
 import { gradeOf } from './rarity';
-import { mapStatues, type Entry } from './catalog';
+import { gachaPool, type Entry } from './catalog';
 
 export const TALK_M = 1.0;
 export const VISIT_BONUS = 20;
@@ -16,46 +16,51 @@ export const VISIT_BONUS = 20;
 export const formatDist = (m: number) =>
   m >= 1000 ? `${(m / 1000).toFixed(1)}km` : m >= 10 ? `${Math.round(m)}m` : `${m.toFixed(1)}m`;
 
-export type Nearest = { entry: Entry; distM: number; inRange: boolean } | null;
+// AR 画面から知らせてもらう、えびすさん 1 体分
+export type ArFigure = { id: string; label: string; progressKey?: string; spawned: boolean; distM: number };
+
+export type Nearest = { figure: ArFigure; entry: Entry | null; distM: number; inRange: boolean } | null;
+
+const entryByKey = new Map(gachaPool.map((e) => [e.key, e]));
 
 let cache: Nearest = null;
 let cacheKey = '';
+let arActive = false;
 const listeners = new Set<() => void>();
+const emit = () => listeners.forEach((fn) => fn());
 
-function compute(): Nearest {
-  const p = position.getPosition();
-  if (!p) return null;
-  let best: Entry | null = null;
-  let bestD = Infinity;
-  for (const e of mapStatues) {
-    const dist = position.distanceM(p, { lat: e.lat!, lng: e.lng! });
-    if (dist < bestD) { bestD = dist; best = e; }
-  }
-  return best ? { entry: best, distM: bestD, inRange: bestD <= TALK_M } : null;
-}
+export const subscribe = (fn: () => void) => {
+  listeners.add(fn);
+  return () => { listeners.delete(fn); };
+};
+export const getNearest = () => cache;
+// AR が動いているか（AR を開始して、えびすさんを置いたあと）
+export const isArActive = () => arActive;
 
-// 位置が変わったら計算し直す。表示が変わる（像・範囲の内外・距離の表示）ときだけ知らせる
-function update() {
-  const n = compute();
-  const key = n ? `${n.entry.key}|${n.inRange}|${formatDist(n.distM)}` : '';
+// AR 画面が定期的に呼ぶ。表示が変わる（相手・範囲の内外・距離の表示）ときだけ知らせる
+export function report(figures: ArFigure[]) {
+  arActive = true;
+  let best: ArFigure | null = null;
+  for (const f of figures) if (f.spawned && (!best || f.distM < best.distM)) best = f;
+  const n: Nearest = best
+    ? { figure: best, entry: best.progressKey ? entryByKey.get(best.progressKey) ?? null : null, distM: best.distM, inRange: best.distM <= TALK_M }
+    : null;
+  const key = `1|${n ? `${n.figure.id}|${n.inRange}|${formatDist(n.distM)}` : ''}`;
   if (key === cacheKey) return;
   cacheKey = key;
   cache = n;
-  listeners.forEach((fn) => fn());
+  emit();
 }
 
-let unsubscribePosition: (() => void) | null = null;
-export function subscribe(fn: () => void) {
-  listeners.add(fn);
-  if (!unsubscribePosition) { unsubscribePosition = position.subscribe(update); update(); }
-  return () => {
-    listeners.delete(fn);
-    if (!listeners.size && unsubscribePosition) { unsubscribePosition(); unsubscribePosition = null; }
-  };
+// AR 画面を閉じたとき
+export function clear() {
+  arActive = false;
+  cache = null;
+  cacheKey = '';
+  emit();
 }
-export const getNearest = () => cache;
 
-export type TalkResult = { entry: Entry; line: string; collected: boolean; visitedFirst: boolean; points: number };
+export type TalkResult = { name: string; entry: Entry | null; line: string; collected: boolean; points: number };
 
 // えびすさんのひとこと（佐賀ことば）。押すたびにどれか
 const LINES = [
@@ -69,14 +74,14 @@ const LINES = [
   '佐賀には、わしの仲間がまだまだおるけんね。',
 ];
 
-// 話しかける。30m 以内なら図鑑に登録・現地ボーナス（はじめてのときだけ）
+// 話しかける。1.0m 以内なら、はじめてのときだけ図鑑に登録・現地ボーナス
 export function talk(n: NonNullable<Nearest>): TalkResult | null {
   if (!n.inRange) return null;
-  const e = n.entry;
-  const statuePoints = gradeOf(e.grade).statuePoints;
-  const before = progress.get().balance; // イベント中の倍率も込みで、増えた分を出すため
-  const collected = progress.collect(e.key, e.name, statuePoints);
-  const visitedFirst = progress.visit(e.key, e.name, VISIT_BONUS);
   const line = LINES[Math.floor(Math.random() * LINES.length)];
-  return { entry: e, line, collected, visitedFirst, points: progress.get().balance - before };
+  const e = n.entry;
+  if (!e) return { name: n.figure.label, entry: null, line, collected: false, points: 0 };
+  const before = progress.get().balance; // イベント中の倍率も込みで、増えた分を出すため
+  const collected = progress.collect(e.key, e.name, gradeOf(e.grade).statuePoints);
+  progress.visit(e.key, e.name, VISIT_BONUS);
+  return { name: e.name, entry: e, line, collected, points: progress.get().balance - before };
 }
