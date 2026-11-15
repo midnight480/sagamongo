@@ -33,11 +33,16 @@ export function Frame({ stage }: { stage?: ReactNode } = {}) {
   // ガチャの演出（効果音）が聞こえるよう、ガチャを開いているあいだは BGM を小さくする
   useEffect(() => bgm.setDuck(open === 'gacha'), [open]);
   const cls = ar ? 'walk is-ar' : 'walk';
-  // 発表用：?quiz=okuma などで、開いたときにその案内人のクイズを出す（?quiz=1 なら、まだ正解していない問題から）
+  // 案内人の QR コード（/guide → /?quiz=1）や発表用の ?quiz=okuma で、開いたときにその案内人のクイズを出す（?quiz=1 なら、まだ正解していない問題から）
   useEffect(() => {
     if (!mounted) return;
     const id = param('quiz');
-    if (id) guideQuiz.meetGuide(id === '1' ? undefined : id);
+    if (!id) return;
+    guideQuiz.meetGuide(id === '1' ? undefined : id);
+    // 読み込み直したときにまた出ないよう、URL から外す（QR コードから来たときも同じ）
+    const url = new URL(location.href);
+    url.searchParams.delete('quiz');
+    history.replaceState(history.state, '', url);
   }, [mounted]);
   if (!mounted) return <main className={cls} aria-busy="true" />;
 

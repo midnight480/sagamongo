@@ -50,6 +50,7 @@
 - 記録は `src/lib/progress.ts` に集める。3D 側は着いた・出会ったときに `collect(key, name, points)`・`visit()`・`awaken()`・`addWalk(m)`・`lapArrive()` を呼ぶ。画面（HUD・図鑑・ガチャ）は記録の変化を受けて自動で描き直す
 - 図鑑の key は `ebisu:<id>`（デモの3体）、`cat:<fid>`（828体の一覧）、`sage:<id>`（七賢人）
 - お知らせは `src/lib/ui-store.ts` の `toast(text)`
+- 案内人のクイズは AR には出さない。町の案内人（おばあちゃん）に印刷した QR コードを渡し、読み取ると `/guide` → `/?quiz=1` でクイズが出る（行き先は `next.config.ts` の redirects。印刷した QR を作り直さずに変えられる）。印刷用のページは `/qr/guide`
 - 案内人に出会ったら `src/lib/guide-quiz.ts` の `meetGuide()` を呼ぶ（佐賀の歴史クイズを出す。`meetGuide('okuma')` のように問題の id も渡せる）。問題は `src/data/history-quiz.json`
 - 右下のミニマップ（`src/components/MiniMap.tsx`）はフレーム側（`src/components/ar/MiniMap.tsx` は AR デモの配置図で、別物）。今いる場所は `src/lib/position.ts` に集める。GPS はミニマップが書き、3D 側がデモの位置（地図を押してそこに立ったことにする、など）を出すときは `setPosition(lat, lng, 'demo')` を呼ぶ
 - 「見に行く」（地図の道案内）は 3D／地図側の担当。`BookDialog` の `onGo(fid)` で外に渡す
@@ -58,7 +59,6 @@
 
 `ar-ebisu-sample`（AR の PoC。仕様は同リポジトリの `docs/reimplementation-guide.md`）を移したもの。`ARClient` で `<Frame stage={<ARView … />} />` とし、トップと同じ枠（図鑑・ガチャ・HUD・ミニマップ・BGM・お知らせ）を AR 画面の上に重ねている。枠は `Frame` の `stage` に渡したものを `StageSlot` の代わりに敷く（`.walk.is-ar` のときの置き方は `globals.css` の末尾）。
 
-- デモ用の案内人「おばあちゃん」（`figure: obaachan`）を置いている。元絵は自作の `scripts/obaachan.svg`（左が正面、右が背面）。絵を変えたら sharp で `assets/figures/obaachan.png` に書き出してから `npm run prepare:figure`。タップでクイズを出すつなぎはまだ無い
 
 - 置くものは `src/data/ar-objects.json` で決める。2 段に分かれている
   - `figures`: 素材（見た目）。`views` は面の並び（`["front","back"]` の二面、または `["front","side","back"]` の三面）。元画像は白背景で、左から `views` の順に等幅で並べる
@@ -110,11 +110,11 @@
 ├── public/sw.js         # Service Worker。中身を変えたら VERSION を上げる
 ├── .nvmrc               # ローカル開発の Node.js バージョン（nvm 用）
 ├── assets/figures/      # AR の素材の元画像（白背景。左から views の順）
-├── scripts/             # prepare-figure.mjs（AR の素材生成。npm run prepare:figure）と lib/、obaachan.svg（案内人の元絵）、icon.svg・make-icons.mjs（PWA のアイコンを作る）
+├── scripts/             # prepare-figure.mjs（AR の素材生成。npm run prepare:figure）と lib/、icon.svg・make-icons.mjs（PWA のアイコンを作る）
 ├── public/img/sages/    # 七賢人の肖像（国立国会図書館「近代日本人の肖像」）
 ├── public/figures/      # AR の素材の生成物（<id>/{front,back,side}.png・board.json）
 └── src/
-    ├── app/             # ページとレイアウト（layout.tsx / page.tsx / manifest.ts / globals.css）、ar-demo/（AR のデモ）
+    ├── app/             # ページとレイアウト（layout.tsx / page.tsx / manifest.ts / globals.css）、ar-demo/（AR のデモ）、qr/guide/（案内人に渡す QR コードの印刷用）
     ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・GuideQuizDialog・BgmButton・PwaRegister・MiniMap・StageSlot（3D の差し込み場所）
     │   └── ar/          # AR 画面（ARView・SceneObject・FigureBoard・カメラ・位置・デバッグ）
     ├── hooks/           # ブラウザ API の購読（カメラ・端末の向き・位置情報）
