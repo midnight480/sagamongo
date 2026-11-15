@@ -4,7 +4,7 @@
 // ・ほかのサイト（公式サイトのえびす像の写真など）：ここでは扱わない（ブラウザに任せる）
 // 中身を変えたら VERSION を上げる。古い置き場は次に開いたときに消える。
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = `sagamongo-${VERSION}`;
 const PRECACHE = [
   '/',
