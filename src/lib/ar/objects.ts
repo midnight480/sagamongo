@@ -68,3 +68,25 @@ export const AR_OBJECTS: ARObjectDefinition[] = (config.objects as RawObject[]).
     progressKey: o.progressKey,
   };
 });
+
+/**
+ * 動作確認用（?near=0.5）：動き回るえびすさん（motion: wander）を、視線の真正面 nearM 先に出す。
+ * 「話しかける」（1.0m 以内）を試せるよう、近づきすぎたら離れる距離（minDistanceM）を nearM まで下げ、
+ * 歩き回る範囲（radiusM）を nearM × 0.8 に狭める。歩き回りながら、ユーザーからおよそ nearM × 1.8 以内にいる
+ * （0.5m なら 0.9m 以内。「出し直す」でまた目の前に出る）
+ */
+export function withNearSpawn(objects: ARObjectDefinition[], nearM: number): ARObjectDefinition[] {
+  return objects.map((o) =>
+    o.motion.type !== "wander"
+      ? o
+      : {
+          ...o,
+          spawn: { type: "ahead", distanceM: [nearM, nearM], spreadDeg: 0 },
+          motion: {
+            ...o.motion,
+            minDistanceM: Math.min(o.motion.minDistanceM ?? 0.8, nearM),
+            radiusM: Math.min(o.motion.radiusM, nearM * 0.8),
+          },
+        },
+  );
+}
