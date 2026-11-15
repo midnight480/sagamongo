@@ -12,7 +12,87 @@
       "name": "えびすさん",
       "heightM": 1.2,
       "source": "assets/figures/ebisu.png",
-      "views": ["front", "back"]
+      "views": [
+        "front",
+        "back"
+      ]
+    },
+    {
+      "id": "sage-naomasa",
+      "name": "鍋島直正（閑叟）",
+      "heightM": 1.57,
+      "source": "assets/figures/sage-naomasa.png",
+      "views": [
+        "front",
+        "side",
+        "back"
+      ]
+    },
+    {
+      "id": "sage-sano",
+      "name": "佐野常民",
+      "heightM": 1.57,
+      "source": "assets/figures/sage-sano.png",
+      "views": [
+        "front",
+        "side",
+        "back"
+      ]
+    },
+    {
+      "id": "sage-shima",
+      "name": "島義勇",
+      "heightM": 1.57,
+      "source": "assets/figures/sage-shima.png",
+      "views": [
+        "front",
+        "side",
+        "back"
+      ]
+    },
+    {
+      "id": "sage-soejima",
+      "name": "副島種臣",
+      "heightM": 1.57,
+      "source": "assets/figures/sage-soejima.png",
+      "views": [
+        "front",
+        "side",
+        "back"
+      ]
+    },
+    {
+      "id": "sage-oki",
+      "name": "大木喬任",
+      "heightM": 1.57,
+      "source": "assets/figures/sage-oki.png",
+      "views": [
+        "front",
+        "side",
+        "back"
+      ]
+    },
+    {
+      "id": "sage-eto",
+      "name": "江藤新平",
+      "heightM": 1.57,
+      "source": "assets/figures/sage-eto.png",
+      "views": [
+        "front",
+        "side",
+        "back"
+      ]
+    },
+    {
+      "id": "sage-okuma",
+      "name": "大隈重信",
+      "heightM": 1.8,
+      "source": "assets/figures/sage-okuma.png",
+      "views": [
+        "front",
+        "side",
+        "back"
+      ]
     }
   ],
   "objects": [
@@ -21,14 +101,24 @@
       "progressKey": "ebisu:yasaka",
       "figure": "ebisu",
       "label": "えびすさん",
-      "spawn": { "type": "ahead", "distanceM": [5, 8], "spreadDeg": 15 },
+      "spawn": {
+        "type": "ahead",
+        "distanceM": [
+          5,
+          8
+        ],
+        "spreadDeg": 15
+      },
       "motion": {
         "type": "wander",
         "radiusM": 8,
         "speedMps": 0.35,
         "turnIntervalS": 5,
         "pauseProbability": 0.3,
-        "pauseS": [1.5, 3],
+        "pauseS": [
+          1.5,
+          3
+        ],
         "minDistanceM": 0.8,
         "turnTimeConstantS": 0.6
       }
@@ -38,8 +128,17 @@
       "progressKey": "ebisu:houtomi",
       "figure": "ebisu",
       "label": "立ち止まるえびすさん",
-      "spawn": { "type": "ahead", "distanceM": [9, 12], "spreadDeg": 25 },
-      "motion": { "type": "stay" }
+      "spawn": {
+        "type": "ahead",
+        "distanceM": [
+          9,
+          12
+        ],
+        "spreadDeg": 25
+      },
+      "motion": {
+        "type": "stay"
+      }
     }
   ]
 }
