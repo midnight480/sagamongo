@@ -3,7 +3,7 @@
 // ここに知らせる。いちばん近いえびすさんまで 1.0m 以内なら「話しかける」を押せる。
 // 仕様（ebisu-walk.md）：えびすさんのすぐそば（1.0m 以内）まで近づくと「話しかける」を押せ、話しかけると図鑑に登録し、ポイントがもらえる
 //   図鑑に登録：レア度に応じたポイント（ガチャで持っていた像はなし）／現地ボーナス：はじめてのとき +20pt
-//   どの図鑑の像として数えるかは、ar-objects.json の objects[].progressKey（例 'ebisu:yasaka'）。無ければ、ひとことだけ
+//   どの図鑑の像として数えるかは、AR 画面が知らせる progressKey（出てくるときに lib/ar/objects.ts の drawStatues で抽選）。無ければ、ひとことだけ
 
 import * as progress from './progress';
 import { gradeOf } from './rarity';

@@ -18,7 +18,6 @@
   "objects": [
     {
       "id": "ebisu-walk",
-      "progressKey": "ebisu:yasaka",
       "figure": "ebisu",
       "label": "えびすさん",
       "spawn": { "type": "ahead", "distanceM": [5, 8], "spreadDeg": 15 },
@@ -35,7 +34,6 @@
     },
     {
       "id": "ebisu-stay",
-      "progressKey": "ebisu:houtomi",
       "figure": "ebisu",
       "label": "立ち止まるえびすさん",
       "spawn": { "type": "ahead", "distanceM": [9, 12], "spreadDeg": 25 },

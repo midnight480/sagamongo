@@ -4,13 +4,13 @@
 // 移植元: ar-ebisu-sample/components/ar/ARView.tsx（定義の配列を受け取り、何体でも並べられるようにした）
 
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect, useRef, useState, type PointerEvent } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { useCameraStream } from "@/hooks/useCameraStream";
 import { useDeviceOrientation } from "@/hooks/useDeviceOrientation";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { describeSpawn } from "@/lib/ar/behaviors";
 import { DEFAULT_THRESHOLDS, type FacingThresholds } from "@/lib/ar/facing";
-import type { ARObjectDefinition } from "@/lib/ar/objects";
+import { drawStatues, type ARObjectDefinition } from "@/lib/ar/objects";
 import { CameraBackground } from "./CameraBackground";
 import { DebugPanel } from "./DebugPanel";
 import { OrientationCamera } from "./OrientationCamera";
@@ -18,6 +18,8 @@ import { SceneObject } from "./SceneObject";
 import { createDebugInfo, createUserState, type DebugInfo, type DragLook, type UserState } from "./types";
 import { UserLocomotion } from "./UserLocomotion";
 import * as nearby from "@/lib/nearby";
+import * as progress from "@/lib/progress";
+import { useProgress } from "@/lib/ui-store";
 
 /** 「話しかける」（フレーム側）に、えびすさんとの距離を知らせる間隔（ms） */
 const NEARBY_INTERVAL_MS = 150;
@@ -32,7 +34,7 @@ type Props = {
   title: string;
 };
 
-export default function ARView({ objects, title }: Props) {
+export default function ARView({ objects: defs, title }: Props) {
   const camera = useCameraStream();
   const orientation = useDeviceOrientation();
   const geo = useGeolocation();
@@ -43,6 +45,24 @@ export default function ARView({ objects, title }: Props) {
   const [fov, setFov] = useState(60);
   const [showGuide, setShowGuide] = useState(false);
   const [spawnKey, setSpawnKey] = useState(0);
+  // 各えびすさんがどの図鑑の像か。出てくるとき（開始時・「出し直す」）に抽選する
+  const [statues, setStatues] = useState(() => drawStatues(defs));
+  useProgress();
+  const version = progress.getVersion();
+  // 名札と「話しかける」の名前：図鑑に入っている像ならその名前、まだなら「えびすさん」のまま
+  const objects = useMemo(
+    () => defs.map((o) => {
+      const e = statues[o.id];
+      return { ...o, progressKey: e?.key, label: e && progress.has(e.key) ? e.name : o.label };
+    }),
+    // version：図鑑に入ったら名前を出し直す
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [defs, statues, version],
+  );
+  const respawn = () => {
+    setStatues(drawStatues(defs));
+    setSpawnKey((k) => k + 1);
+  };
 
   const debugRef = useRef<DebugInfo>(createDebugInfo());
   const userRef = useRef<UserState>(createUserState());
@@ -162,7 +182,7 @@ export default function ARView({ objects, title }: Props) {
             onThresholdsChange={setThresholds}
             showGuide={showGuide}
             onShowGuideChange={setShowGuide}
-            onRespawn={() => setSpawnKey((k) => k + 1)}
+            onRespawn={respawn}
           />
         ) : (
           <div className="ar-start">
