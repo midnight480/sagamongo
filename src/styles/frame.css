@@ -130,7 +130,7 @@
   --gacha-cap-pink: #ec4899;
   --gacha-rainbow: linear-gradient(90deg, #ef4444, #f59e0b, #eab308, #22c55e, #3b82f6, #8b5cf6, #ef4444);
 }
-#gacha-pay { width: 100%; margin: var(--space-2) 0 var(--space-3); font-size: var(--font-size-md); font-weight: 700; }
+#gacha-pay, .gacha-pay-points { width: 100%; margin: var(--space-2) 0 var(--space-1); font-size: var(--font-size-md); font-weight: 700; }
 .gacha-stage-wrap { position: relative; display: grid; justify-items: center; }
 .gacha-stage { width: 320px; max-width: 100%; aspect-ratio: 320 / 280; cursor: pointer; }
 .gacha-tap {
