@@ -71,6 +71,7 @@
 
 - フレームワーク: Next.js 16（App Router）+ React 19 + TypeScript
 - ホスティング: Vercel（Fluid Compute、Node.js 24）
+- ローカル開発: Node.js 26.12.0（`.nvmrc` に指定。`nvm use` で切り替える）
 - 地図（3D 側で使う予定）: Leaflet（タイルは国土地理院）、徒歩ルートは OpenStreetMap
 - 公開先: https://sagamongo.vercel.app（Vercel の `midnight480` チーム、プロジェクト名 `sagamongo`）
 - 設定ファイル: `vercel.ts`（`@vercel/config`）
@@ -83,6 +84,7 @@
 ├── CLAUDE.md            # Claude Code 用。@AGENTS.md を読み込むだけ
 ├── README.md
 ├── vercel.ts            # Vercel のプロジェクト設定
+├── .nvmrc               # ローカル開発の Node.js バージョン（nvm 用）
 ├── public/img/sages/    # 七賢人の肖像（国立国会図書館「近代日本人の肖像」）
 └── src/
     ├── app/             # ページとレイアウト（layout.tsx / page.tsx / globals.css）
