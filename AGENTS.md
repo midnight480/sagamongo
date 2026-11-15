@@ -84,11 +84,15 @@
 ├── CLAUDE.md            # Claude Code 用。@AGENTS.md を読み込むだけ
 ├── README.md
 ├── vercel.ts            # Vercel のプロジェクト設定
+├── next.config.ts       # Next.js の設定（/sw.js のヘッダー）
+├── scripts/             # icon.svg（アイコンの元絵）・make-icons.mjs（PNG を作る）
+├── public/icons/        # PWA のアイコン
+├── public/sw.js         # Service Worker。中身を変えたら VERSION を上げる
 ├── .nvmrc               # ローカル開発の Node.js バージョン（nvm 用）
 ├── public/img/sages/    # 七賢人の肖像（国立国会図書館「近代日本人の肖像」）
 └── src/
-    ├── app/             # ページとレイアウト（layout.tsx / page.tsx / globals.css）
-    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・StageSlot（3D の差し込み場所）
+    ├── app/             # ページとレイアウト（layout.tsx / page.tsx / manifest.ts / globals.css）
+    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・PwaRegister・StageSlot（3D の差し込み場所）
     ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store
     ├── data/            # 試作から移した JSON（ebisu-catalog / ebisu-demo / characters / chapters / events / ranking-demo）
     └── styles/          # tokens.css・components.css（design/ から複製）、frame.css（試作 walk.css から移したもの）
