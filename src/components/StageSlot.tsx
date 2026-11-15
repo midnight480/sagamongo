@@ -10,12 +10,14 @@
 //   awaken(key, name, points)   写真を撮って動き出した
 //   addWalk(m)                  歩いた距離
 //   lapArrive(chapter, id)      周回の像に着いた
+// 案内人に出会ったら lib/guide-quiz.ts の meetGuide()（佐賀の歴史クイズを出す）。
 // ポイントの値は lib/rarity.ts の GRADES[grade].statuePoints など。お知らせは lib/ui-store.ts の toast(text)。
 
 import * as progress from '@/lib/progress';
 import { toast } from '@/lib/ui-store';
 import { gradeOf } from '@/lib/rarity';
 import { catalogEntries } from '@/lib/catalog';
+import * as guideQuiz from '@/lib/guide-quiz';
 
 export function StageSlot() {
   // デモ用：3D がまだないので、ランダムなえびす像に「着いた」ことにするボタンを置く
@@ -35,6 +37,9 @@ export function StageSlot() {
       <p className="walk-demo-note">3D 部分は別の担当が作っています。フレーム側の確認用に、着いたことにできます。</p>
       <button type="button" className="btn btn-secondary btn-sm" onClick={arriveRandom}>
         どこかのえびす像に着いたことにする（デモ）
+      </button>
+      <button type="button" className="btn btn-secondary btn-sm" onClick={() => guideQuiz.meetGuide()}>
+        案内人に出会ったことにする（デモ）
       </button>
     </section>
   );
