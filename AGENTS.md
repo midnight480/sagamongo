@@ -100,14 +100,17 @@
 ├── CLAUDE.md            # Claude Code 用。@AGENTS.md を読み込むだけ
 ├── README.md
 ├── vercel.ts            # Vercel のプロジェクト設定
+├── next.config.ts       # Next.js の設定（/sw.js のヘッダー）
+├── public/icons/        # PWA のアイコン
+├── public/sw.js         # Service Worker。中身を変えたら VERSION を上げる
 ├── .nvmrc               # ローカル開発の Node.js バージョン（nvm 用）
 ├── assets/figures/      # AR の素材の元画像（白背景。左から views の順）
-├── scripts/             # prepare-figure.mjs（AR の素材生成。npm run prepare:figure）と lib/
+├── scripts/             # prepare-figure.mjs（AR の素材生成。npm run prepare:figure）と lib/、icon.svg・make-icons.mjs（PWA のアイコンを作る）
 ├── public/img/sages/    # 七賢人の肖像（国立国会図書館「近代日本人の肖像」）
 ├── public/figures/      # AR の素材の生成物（<id>/{front,back,side}.png・board.json）
 └── src/
-    ├── app/             # ページとレイアウト（layout.tsx / page.tsx / globals.css）、ar-demo/（AR のデモ）
-    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・BgmButton・StageSlot（3D の差し込み場所）
+    ├── app/             # ページとレイアウト（layout.tsx / page.tsx / manifest.ts / globals.css）、ar-demo/（AR のデモ）
+    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・BgmButton・PwaRegister・StageSlot（3D の差し込み場所）
     │   └── ar/          # AR 画面（ARView・SceneObject・FigureBoard・カメラ・位置・デバッグ）
     ├── hooks/           # ブラウザ API の購読（カメラ・端末の向き・位置情報）
     ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）

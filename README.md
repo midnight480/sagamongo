@@ -19,6 +19,7 @@ SAGA スマートハッカソン（2026-11-15）で作っているアプリの�
 | ポイント | 使えるポイントと累積ポイント、段位、履歴 |
 | 七賢人が仲間になる | えびす像を 10 体集めるごとに一人（N → R → SR → SSR の順） |
 | イベントのブースト | 十日恵比須大祭の期間はポイント 2 倍・ガチャのレア 2 倍 |
+| PWA | ホーム画面に追加すると、アプリのように全画面で開く。一度開いた画面は端末に置き、電波が悪くても開ける |
 | BGM（自作） | お囃子風の曲「えびす囃子」を Web Audio でその場で鳴らす。最初に画面に触れると流れ、上の「BGM」ボタンで止められる。ガチャ中は小さくなる |
 
 まだ移していないもの：案内人とクエスト、知恵くらべ（クイズ）、好みを聞く画面、周回のコンプリート画面、記念撮影。
@@ -51,6 +52,13 @@ npm run lint
 npm run build
 ```
 
+## ホーム画面に追加する（PWA）
+
+- iPhone（Safari）：共有ボタン →「ホーム画面に追加」
+- Android（Chrome）：メニュー →「ホーム画面に追加」（または「アプリをインストール」）
+
+Service Worker を変えたら、`public/sw.js` の `VERSION` を上げてください。古い置き場は次に開いたときに消えます。アイコンを描き直したら `node scripts/make-icons.mjs` を流します。
+
 ## デプロイ
 
 Vercel の `midnight480` チームの `sagamongo` プロジェクトに、GitHub のリポジトリをつないであります。
@@ -79,9 +87,11 @@ src/
 ├── data/           # えびす像・七賢人・エリア・イベントなどの JSON（試作から移したもの）、AR に置くもの
 └── styles/         # デザイントークンと部品のスタイル
 public/img/sages/   # 七賢人の肖像写真
+public/icons/       # アプリのアイコン（scripts/icon.svg から scripts/make-icons.mjs で作る）
+public/sw.js        # Service Worker（PWA。画面と静的ファイルを端末に置く）
 public/figures/     # AR の素材（npm run prepare:figure の生成物）
 assets/figures/     # AR の素材の元画像
-scripts/            # 素材の生成スクリプト
+scripts/            # 素材の生成スクリプト（AR の素材、PWA のアイコン）
 ```
 
 ## 記録とプライバシー
