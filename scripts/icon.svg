@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- さがもん！Go！のアイコン（自作）：赤地に金の丸と、えびすさんの鯛 -->
+  <rect width="512" height="512" fill="#b91c1c"/>
+  <circle cx="256" cy="256" r="176" fill="#fbbf24"/>
+  <circle cx="256" cy="256" r="176" fill="none" stroke="#fff7cc" stroke-width="8"/>
+  <path d="M188 204 L216 168 L246 182 L276 172 L306 206 Z" fill="#e11d48" stroke="#ffffff" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M346 262 L414 198 L398 262 L414 326 Z" fill="#e11d48" stroke="#ffffff" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M112 262 C146 184 292 176 362 262 C292 348 146 340 112 262 Z" fill="#e11d48" stroke="#ffffff" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M184 222 Q202 262 184 302" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+  <path d="M232 300 L252 330 L272 302" fill="#be123c" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="156" cy="246" r="14" fill="#ffffff"/>
+  <circle cx="158" cy="246" r="7" fill="#1f2328"/>
+  <path d="M116 270 Q128 276 140 272" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+</svg>
