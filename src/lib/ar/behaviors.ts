@@ -185,5 +185,7 @@ export function guideRadiusOf(motion: MotionRule): number | null {
 
 /** 画面の説明文用：出方の距離の目安（m） */
 export function describeSpawn(spawn: SpawnRule): string {
-  return spawn.type === 'ahead' ? `${spawn.distanceM[0]}〜${spawn.distanceM[1]}m 先` : '決まった場所';
+  if (spawn.type !== 'ahead') return '決まった場所';
+  const [a, b] = spawn.distanceM;
+  return a === b ? `${a}m 先` : `${a}〜${b}m 先`;
 }

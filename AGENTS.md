@@ -70,6 +70,7 @@
 - ユーザーの位置は GPS の測位をそのまま使う（`src/components/ar/UserLocomotion.tsx`）。精度での間引きや強い平滑化を入れると、精度の悪い街中で位置が 0,0 から動かなくなる・歩いても距離が縮まない。原点は最初の測位で決め、ページを開き直すまで変えない
 - 二面の素材は、θ < 90° で正面、それ以上で背面。真横から見ても板は進行方向を向いたまま
 - 素材を変えたら `npm run prepare:figure` で `public/figures/<id>/` を作り直し、生成物もコミットする（ビルドでは走らせない）
+- 動作確認用に `/ar-demo?near=0.5` で、動き回るえびすさん（`wander`）を視線の真正面 0.5m に出す（`src/lib/ar/objects.ts` の `withNearSpawn`。`minDistanceM` を 0.5m、`radiusM` を 0.4m にして、1.0m 以内にいるようにする）
 - 図鑑とは `objects[].progressKey`（図鑑の key）でつなぐ。1.0m 以内で「話しかける」と、その像として図鑑に登録する（`src/lib/nearby.ts`）
 - drei の `<Html>` は、後からマウントするとカメラか位置が動くまで距離に応じた拡大率を当てない。名札は最初からマウントし、表示だけ切り替える
 
