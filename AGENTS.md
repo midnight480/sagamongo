@@ -116,10 +116,10 @@
 ├── public/figures/      # AR の素材の生成物（<id>/{front,back,side}.png・board.json）
 └── src/
     ├── app/             # ページとレイアウト（layout.tsx / page.tsx / manifest.ts / globals.css）、ar-demo/（AR のデモ）、qr/guide/（案内人に渡す QR コードの印刷用）
-    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・GuideQuizDialog・QrScanDialog（案内人の QR を読む）・TalkButton（話しかける）・BgmButton・PwaRegister・MiniMap・StageSlot（3D の差し込み場所）
+    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・GuideQuizDialog・QrScanDialog（案内人の QR を読む）・TalkButton（話しかける）・SelfieDialog（七賢人と記念撮影）・BgmButton・PwaRegister・MiniMap・StageSlot（3D の差し込み場所）
     │   └── ar/          # AR 画面（ARView・SceneObject・FigureBoard・カメラ・位置・デバッグ）
     ├── hooks/           # ブラウザ API の購読（カメラ・端末の向き・位置情報）
-    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）・guide-quiz（案内人の歴史クイズ）・position（今いる場所）・demo（デモ操作）・guide-qr（案内人の QR）・nearby（AR のえびすさんとの距離・話しかける）
+    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）・guide-quiz（案内人の歴史クイズ）・position（今いる場所）・demo（デモ操作）・guide-qr（案内人の QR）・nearby（AR のえびすさんとの距離・話しかける）・sage-figure（七賢人の絵。記念撮影で使う）
     │   └── ar/          # AR の純粋関数（angle・geo・facing・behaviors（出方・動き方）・objects（定義の読み込み））
     ├── data/            # 試作から移した JSON（ebisu-catalog / ebisu-demo / characters / chapters / events / ranking-demo）、ar-objects.json、history-quiz.json（案内人の歴史クイズ）
     └── styles/          # tokens.css・components.css（design/ から複製）、frame.css（試作 walk.css から移したもの）、ar.css

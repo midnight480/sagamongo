@@ -26,6 +26,7 @@ export type Sage = {
   bio: string;
   grade: Grade;
   color: string;
+  style: 'wa' | 'yo'; // 絵の描き分け（wa = 着物と髷、yo = 洋装）
   portrait: Portrait | null;
 };
 
@@ -57,6 +58,7 @@ export const sages: Sage[] = characters.sages.map((s) => ({
   bio: s.bio,
   grade: toGrade(s.grade),
   color: s.color,
+  style: s.style === 'yo' ? 'yo' : 'wa',
   portrait: s.portrait ? { ...s.portrait, src: `/${s.portrait.src}` } : null,
 }));
 

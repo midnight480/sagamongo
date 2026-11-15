@@ -14,6 +14,7 @@ import { BookDialog } from './BookDialog';
 import { JoinDialog } from './JoinDialog';
 import { GuideQuizDialog } from './GuideQuizDialog';
 import { QrScanDialog } from './QrScanDialog';
+import { SelfieDialog } from './SelfieDialog';
 import * as guideQuiz from '@/lib/guide-quiz';
 import { param } from '@/lib/params';
 import { StageSlot } from './StageSlot';
@@ -21,7 +22,7 @@ import { MiniMap } from './MiniMap';
 import { BgmButton } from './BgmButton';
 import * as bgm from '@/lib/bgm';
 
-type Open = null | 'book' | 'gacha' | 'qr';
+type Open = null | 'book' | 'gacha' | 'qr' | 'selfie';
 
 export function Frame({ stage }: { stage?: ReactNode } = {}) {
   const ar = stage != null;
@@ -58,6 +59,7 @@ export function Frame({ stage }: { stage?: ReactNode } = {}) {
         <div className="walk-bar">
           <button type="button" className="btn btn-secondary btn-sm" onClick={() => setOpen('book')}>図鑑・ランキング</button>
           <button type="button" className="btn btn-primary btn-sm" onClick={() => setOpen('gacha')}>ガチャ</button>
+          <button type="button" className="btn btn-secondary btn-sm" onClick={() => setOpen('selfie')}>記念撮影</button>
           <BgmButton />
           {ar ? (
             <>
@@ -79,6 +81,7 @@ export function Frame({ stage }: { stage?: ReactNode } = {}) {
       <GachaDialog open={open === 'gacha'} onClose={() => setOpen(null)} />
       <JoinDialog />
       <GuideQuizDialog />
+      {open === 'selfie' && <SelfieDialog onClose={() => setOpen(null)} />}
       {ar && <QrScanDialog open={open === 'qr'} onClose={() => setOpen(null)} onFound={onGuideQr} />}
     </main>
   );
