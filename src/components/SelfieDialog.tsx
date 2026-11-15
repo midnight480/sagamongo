@@ -277,7 +277,7 @@ export function SelfieDialog({ onClose }: { onClose: () => void }) {
         </div>
       )}
       <video ref={video} playsInline muted hidden />
-      <p className="walk-demo-note">七賢人の顔：国立国会図書館「近代日本人の肖像」</p>
+      <p className="walk-demo-note">七賢人の顔：国立国会図書館「近代日本人の肖像」、島義勇は北海道大学附属図書館 北方資料室所蔵（パブリックドメイン）</p>
       <div className="modal-actions">
         <button type="button" className="btn btn-secondary" onClick={onClose}>閉じる</button>
       </div>

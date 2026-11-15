@@ -29,7 +29,7 @@
 - **ユーザーの写真は端末の中だけに置き、サーバーに送らない。** 保存・共有は本人が押したときだけ
 - **えびす像の写真はリポジトリに保存しない。** 恵比須DEまちづくりネットワークの公式サイトから表示する。一般公開の前に使い方を相談する
 - BGM・効果音は自作（Web Audio で鳴らす）か、権利を確かめたフリー素材だけを使う。使うなら出典とライセンスを README に書く
-- 七賢人の肖像は国立国会図書館「近代日本人の肖像」のものだけを使う。権利を確かめていない画像は置かない
+- 七賢人の肖像は国立国会図書館「近代日本人の肖像」のものを使う。そこに無い島義勇だけは、Wikimedia Commons の 1868 年ごろの写真（北海道大学附属図書館 北方資料室所蔵、パブリックドメイン）を使う。権利を確かめていない画像は置かない
 - 決済はデモ（実際の支払いは起きない）。ほかの参加者・ランキングの相手・案内人は架空でよい。本番の決済を入れるときは Stripe などをサーバー側（Vercel Functions）でつなぐ
 - 会場で歩かずに見せられるよう、デモ用の操作（地図を押してそこに立ったことにする、`?gacha=SSR` などの URL パラメータ）を残す
 - 試作では記録はブラウザの中（localStorage）。ランキングなどを本物にするときは、Vercel Functions + Marketplace の DB に置く（試作メモの「Worker + D1」は Vercel 版ではこれに読み替える）
@@ -112,7 +112,7 @@
 ├── .nvmrc               # ローカル開発の Node.js バージョン（nvm 用）
 ├── assets/figures/      # AR の素材の元画像（白背景。左から views の順）
 ├── scripts/             # prepare-figure.mjs（AR の素材生成。npm run prepare:figure）と lib/、icon.svg・make-icons.mjs（PWA のアイコンを作る）
-├── public/img/sages/    # 七賢人の肖像（国立国会図書館「近代日本人の肖像」）
+├── public/img/sages/    # 七賢人の肖像（国立国会図書館「近代日本人の肖像」。shima.jpg だけ北海道大学附属図書館 北方資料室所蔵の写真、Wikimedia Commons）
 ├── public/figures/      # AR の素材の生成物（<id>/{front,back,side}.png・board.json）
 └── src/
     ├── app/             # ページとレイアウト（layout.tsx / page.tsx / manifest.ts / globals.css）、ar-demo/（AR のデモ）、qr/guide/（案内人に渡す QR コードの印刷用）
