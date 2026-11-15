@@ -3,7 +3,7 @@
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
-import { GEO_CONFIG, toLocal, type GeoFix } from "@/lib/ar/geo";
+import { GEO_CONFIG, toLocal, updatePositionEstimate, type GeoFix } from "@/lib/ar/geo";
 import type { UserState } from "./types";
 
 /** 仮想移動に使うキー → [前, 右] */
@@ -28,8 +28,7 @@ type Props = {
 
 /**
  * ユーザーの現実空間での位置を毎フレーム更新する。
- * GPS の測位 → ローカル座標（精度に関係なくそのまま使う）→ 描画位置へ短い時定数で寄せる。
- * 原点は最初の測位で決め、以後は変えない（歩いている途中で座標がリセットされないように）。
+ * GPS の測位 → ローカル座標 → 精度重み付きで平滑化 → 描画位置へ滑らかに寄せる。
  * PC などでは WASD / 矢印キーで仮想的に歩ける（GPS 位置に加算される）。
  */
 export function UserLocomotion({ fixRef, fixCountRef, userRef }: Props) {
@@ -56,15 +55,14 @@ export function UserLocomotion({ fixRef, fixCountRef, userRef }: Props) {
     const user = userRef.current;
     const dt = Math.min(delta, 0.1);
 
-    // 新しい測位があれば GPS 位置を更新（最初の測位がワールドの原点になる）
+    // 新しい測位があれば推定位置を更新（最初に採用した測位がワールドの原点になる）
     const fix = fixRef.current;
     if (fix && fixCountRef.current !== user.lastFixCount) {
       user.lastFixCount = fixCountRef.current;
-      if (!user.origin) user.origin = { lat: fix.lat, lng: fix.lng };
-      const local = toLocal(user.origin, fix);
-      user.gpsX = local.x;
-      user.gpsZ = local.z;
-      user.hasFix = true;
+      if (!user.origin && fix.accuracy <= GEO_CONFIG.maxAccuracyM) user.origin = { lat: fix.lat, lng: fix.lng };
+      if (user.origin) {
+        user.estimate = updatePositionEstimate(user.estimate, toLocal(user.origin, fix), fix.accuracy, fix.timestamp);
+      }
     }
 
     // キー操作による仮想移動（視線の水平方向を前とする）
@@ -86,11 +84,10 @@ export function UserLocomotion({ fixRef, fixCountRef, userRef }: Props) {
     }
 
     // GPS の更新だけを滑らかにし（ジャンプを見せない）、キー操作の移動量はそのまま足す
-    if (user.hasFix) {
-      const tc = GEO_CONFIG.positionTimeConstant;
-      const k = tc > 0 ? 1 - Math.exp(-dt / tc) : 1;
-      user.smoothX += (user.gpsX - user.smoothX) * k;
-      user.smoothZ += (user.gpsZ - user.smoothZ) * k;
+    if (user.estimate) {
+      const k = 1 - Math.exp(-dt / GEO_CONFIG.positionTimeConstant);
+      user.smoothX += (user.estimate.x - user.smoothX) * k;
+      user.smoothZ += (user.estimate.z - user.smoothZ) * k;
     }
     user.x = user.smoothX + user.virtualX;
     user.z = user.smoothZ + user.virtualZ;

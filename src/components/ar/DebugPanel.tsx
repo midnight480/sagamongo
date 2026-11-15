@@ -6,7 +6,7 @@
 import { useEffect, useState, type ReactNode, type RefObject } from "react";
 import type { GeoStatus } from "@/hooks/useGeolocation";
 import type { FacingThresholds } from "@/lib/ar/facing";
-import type { GeoFix, LatLng } from "@/lib/ar/geo";
+import { toLocal, type GeoFix } from "@/lib/ar/geo";
 import { MiniMap, type MiniMapData } from "./MiniMap";
 import { createDebugInfo, createUserState, type DebugInfo, type HeadingSource, type ObjectDebug, type UserState } from "./types";
 
@@ -34,15 +34,11 @@ type Snapshot = {
   headingSource: HeadingSource;
   headingOffsetDeg: number;
   virtual: { x: number; z: number };
-  /** ワールド座標の原点（最初の測位） */
-  origin: LatLng | null;
-  /** 最新の測位をそのままローカル座標にした位置（キー移動は含まない） */
-  gps: { x: number; z: number } | null;
   map: MiniMapData;
 };
 
 function takeSnapshot(info: DebugInfo, user: UserState, fix: GeoFix | null, fixCount: number, selectedId: string): Snapshot {
-  const gps = user.hasFix ? { x: user.gpsX, z: user.gpsZ } : null;
+  const raw = fix && user.origin ? toLocal(user.origin, fix) : null;
   const objects = Object.fromEntries(Object.entries(info.objects).map(([id, o]) => [id, { ...o }]));
   return {
     info: { ...info, objects },
@@ -52,8 +48,6 @@ function takeSnapshot(info: DebugInfo, user: UserState, fix: GeoFix | null, fixC
     headingSource: user.headingSource,
     headingOffsetDeg: (user.headingOffset * 180) / Math.PI,
     virtual: { x: user.virtualX, z: user.virtualZ },
-    origin: user.origin ? { ...user.origin } : null,
-    gps,
     map: {
       user: { x: info.userX, z: info.userZ, yawDeg: info.cameraYawDeg },
       objects: Object.entries(objects).map(([id, o]) => ({
@@ -66,7 +60,7 @@ function takeSnapshot(info: DebugInfo, user: UserState, fix: GeoFix | null, fixC
         guideRadiusM: o.guideRadiusM,
         selected: id === selectedId,
       })),
-      gps: gps && fix ? { x: gps.x + user.virtualX, z: gps.z + user.virtualZ, accuracy: fix.accuracy } : null,
+      gps: raw && fix ? { x: raw.x + user.virtualX, z: raw.z + user.virtualZ, accuracy: fix.accuracy } : null,
     },
   };
 }
@@ -173,16 +167,6 @@ export function DebugPanel(props: Props) {
             </Row>
           )}
           {props.geoError && <Row label="位置情報エラー">{props.geoError}</Row>}
-          {snap.origin && (
-            <Row label="原点">
-              {snap.origin.lat.toFixed(6)}, {snap.origin.lng.toFixed(6)}
-            </Row>
-          )}
-          {snap.gps && (
-            <Row label="GPS の座標">
-              ({snap.gps.x.toFixed(1)}, {snap.gps.z.toFixed(1)})
-            </Row>
-          )}
           <Row label="自分の座標">
             ({info.userX.toFixed(1)}, {info.userZ.toFixed(1)})
             {snap.virtual.x || snap.virtual.z ? " ※キー移動込み" : ""}

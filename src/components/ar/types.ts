@@ -1,5 +1,5 @@
 import type { FigureFace } from "@/lib/ar/objects";
-import type { LatLng } from "@/lib/ar/geo";
+import type { LatLng, PositionEstimate } from "@/lib/ar/geo";
 
 export type HeadingSource = "ios-compass" | "absolute" | "none";
 
@@ -13,16 +13,13 @@ export type UserState = {
   /** 描画に使う位置（= 滑らかにした GPS 位置 + 仮想移動量, m） */
   x: number;
   z: number;
-  /** GPS 位置へ滑らかに寄せた位置（m） */
+  /** GPS 推定位置へ滑らかに寄せた位置（m） */
   smoothX: number;
   smoothZ: number;
-  /** ワールド座標の原点に対応する緯度経度。最初の測位で決まり、ページを開き直すまで変えない */
+  /** ワールド座標の原点に対応する緯度経度（最初の測位で決まる） */
   origin: LatLng | null;
-  /** 最新の測位をそのままローカル座標にした位置（m）。精度での間引き・平滑化はしない */
-  gpsX: number;
-  gpsZ: number;
-  /** 測位を 1 回でも受け取ったか */
-  hasFix: boolean;
+  /** GPS から推定した位置 */
+  estimate: PositionEstimate | null;
   /** キー操作で動かした量（GPS 位置に加算, m） */
   virtualX: number;
   virtualZ: number;
@@ -39,9 +36,7 @@ export const createUserState = (): UserState => ({
   smoothX: 0,
   smoothZ: 0,
   origin: null,
-  gpsX: 0,
-  gpsZ: 0,
-  hasFix: false,
+  estimate: null,
   virtualX: 0,
   virtualZ: 0,
   lastFixCount: 0,
