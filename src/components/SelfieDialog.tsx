@@ -1,7 +1,7 @@
 'use client';
 
 // 仲間になった七賢人と記念撮影（セルフィー）。
-// 前のカメラの映像に、パーティーの七賢人（最大3人）とえびすさんを並べて 1 枚の写真にする。
+// 前のカメラの映像に、パーティーの七賢人（最大7人）とえびすさんを並べて 1 枚の写真にする。
 // ・指でドラッグして動かす。選んだ人は「小さく／大きく」。左右にいる人はまん中を向く
 // ・写真の下に題名・日付・一緒に写った人の帯
 // ・写真は端末の中だけで作り、どこにも送らない。保存・共有は本人が押したときだけ。はじめての撮影は +20pt
@@ -18,12 +18,17 @@ import { drawSage, SAGE_UNITS } from '@/lib/sage-figure';
 
 const FIRST_BONUS = 20;
 // 並べる位置（画面に対する割合）。x・y は足元、h は背の高さ
+// パーティーの順（新しく仲間になった人から）に、前の列の両端 → 後ろの列 → いちばん奥の順で埋める
 const SLOTS = [
-  { x: 0.2, y: 1.0, h: 0.72 },
-  { x: 0.8, y: 1.0, h: 0.72 },
-  { x: 0.33, y: 0.92, h: 0.58 },
+  { x: 0.22, y: 1.0, h: 0.66 },
+  { x: 0.78, y: 1.0, h: 0.66 },
+  { x: 0.36, y: 0.9, h: 0.54 },
+  { x: 0.64, y: 0.9, h: 0.54 },
+  { x: 0.08, y: 0.86, h: 0.5 },
+  { x: 0.92, y: 0.86, h: 0.5 },
+  { x: 0.5, y: 0.8, h: 0.46 },
 ];
-const EBISU_SLOT = { x: 0.6, y: 0.97, h: 0.36 };
+const EBISU_SLOT = { x: 0.5, y: 0.99, h: 0.34 };
 const EBISU_SRC = '/figures/ebisu/front.png';
 
 type Item = { x: number; y: number; h: number; label: string; sage?: Sage; ebisu?: boolean };
@@ -40,7 +45,7 @@ function layout(withEbisu: boolean): Item[] {
   const party = progress.get().party.map((id) => sages.find((s) => s.id === id)).filter((s): s is Sage => Boolean(s));
   const items: Item[] = party.map((s, i) => ({ ...SLOTS[i % SLOTS.length], sage: s, label: `【${s.grade}】${s.name}` }));
   if (withEbisu) items.push({ ...EBISU_SLOT, ebisu: true, label: 'えびすさん' });
-  return items.sort((a, b) => a.h - b.h); // 奥（小さい人）から描く
+  return items.sort((a, b) => a.y - b.y || a.h - b.h); // 奥（足元が上にある人）から描く
 }
 
 // 開いているあいだだけ置く（Frame で {open && <SelfieDialog />}）。閉じるとカメラを止め、写真も捨てる

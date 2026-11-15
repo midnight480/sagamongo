@@ -25,7 +25,7 @@ export const RANKS = [
 ];
 
 // パーティーに入れる人数
-export const PARTY_MAX = 3;
+export const PARTY_MAX = 7; // 七賢人は全員仲間にできる
 
 // クエストの中身は、案内人のクエストを移すときに決める（試作の quests.js）
 export type QuestDef = {
@@ -95,11 +95,18 @@ const d = (): ProgressData => {
   return data;
 };
 
+// パーティーが最大 3 人だったころに抜けた七賢人を、仲間（図鑑に sage:<id> がある人）なら後ろに戻す
+function withAllSagesInParty(p: ProgressData): ProgressData {
+  const met = Object.keys(p.collected).filter((k) => k.startsWith('sage:')).map((k) => k.slice('sage:'.length));
+  p.party = [...p.party, ...met.filter((id) => !p.party.includes(id))].slice(0, PARTY_MAX);
+  return p;
+}
+
 function load(): ProgressData {
   if (typeof window === 'undefined') return empty();
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? { ...empty(), ...JSON.parse(raw) } : empty();
+    return raw ? withAllSagesInParty({ ...empty(), ...JSON.parse(raw) }) : empty();
   } catch {
     return empty();
   }
