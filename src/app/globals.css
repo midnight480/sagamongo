@@ -97,3 +97,15 @@ html, body { margin: 0; background: var(--color-surface); }
 @media (max-width: 639px) {
   .walk-hud { max-width: calc(100vw - 168px - 3 * var(--space-3)); }
 }
+
+/* ---------- AR 画面の上に枠を重ねるとき（/ar-demo） ---------- */
+/* AR の見出しは上のボタンの下へ。HUD と地図は、下のデバッグ操作（出し直す・デバッグ）の上へ */
+.walk.is-ar .ar-title { padding-top: calc(max(var(--space-3), env(safe-area-inset-top)) + 48px); }
+.walk.is-ar .walk-hud,
+.walk.is-ar .minimap { bottom: calc(max(var(--space-3), env(safe-area-inset-bottom)) + 64px); }
+/* 開始前はボタンの下がないので、ふだんの位置に戻す */
+.walk.is-ar:has(.ar-start) .walk-hud,
+.walk.is-ar:has(.ar-start) .minimap { bottom: calc(max(var(--space-3), env(safe-area-inset-bottom)) + var(--space-3)); }
+/* デバッグを開いたら、HUD と地図は隠す（重なって読めなくなるため） */
+.walk.is-ar:has(.ar-debug-body) .walk-hud,
+.walk.is-ar:has(.ar-debug-body) .minimap { visibility: hidden; }

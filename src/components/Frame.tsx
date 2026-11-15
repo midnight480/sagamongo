@@ -2,8 +2,11 @@
 
 // アプリの枠（フレーム側）。上のボタン、3D の差し込み場所、HUD、お知らせ、各ダイアログを並べる。
 // 記録は端末の localStorage から読むので、サーバーでは描かず、ブラウザで開いてから描く。
+// stage に AR 画面などを渡すと、仮の StageSlot の代わりにそれを敷き、その上に枠を重ねる（/ar-demo）。
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import Link from 'next/link';
+import { arriveRandom } from '@/lib/demo';
 import { useToast } from '@/lib/ui-store';
 import { Hud } from './Hud';
 import { GachaDialog } from './GachaDialog';
@@ -19,7 +22,8 @@ import * as bgm from '@/lib/bgm';
 
 type Open = null | 'book' | 'gacha';
 
-export function Frame() {
+export function Frame({ stage }: { stage?: ReactNode } = {}) {
+  const ar = stage != null;
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState<Open>(null);
   const toastText = useToast();
@@ -28,25 +32,31 @@ export function Frame() {
   useEffect(() => setMounted(true), []);
   // ガチャの演出（効果音）が聞こえるよう、ガチャを開いているあいだは BGM を小さくする
   useEffect(() => bgm.setDuck(open === 'gacha'), [open]);
+  const cls = ar ? 'walk is-ar' : 'walk';
   // 発表用：?quiz=okuma などで、開いたときにその案内人のクイズを出す（?quiz=1 なら、まだ正解していない問題から）
   useEffect(() => {
     if (!mounted) return;
     const id = param('quiz');
     if (id) guideQuiz.meetGuide(id === '1' ? undefined : id);
   }, [mounted]);
-  if (!mounted) return <main className="walk" aria-busy="true" />;
+  if (!mounted) return <main className={cls} aria-busy="true" />;
 
   return (
-    <main className="walk">
+    <main className={cls}>
       <div className="walk-top">
         <div className="walk-bar">
           <button type="button" className="btn btn-secondary btn-sm" onClick={() => setOpen('book')}>図鑑・ランキング</button>
           <button type="button" className="btn btn-primary btn-sm" onClick={() => setOpen('gacha')}>ガチャ</button>
           <BgmButton />
+          {ar ? (
+            <button type="button" className="btn btn-secondary btn-sm" onClick={arriveRandom}>着いたことにする（デモ）</button>
+          ) : (
+            <Link className="btn btn-secondary btn-sm" href="/ar-demo">AR で歩く</Link>
+          )}
         </div>
       </div>
 
-      <StageSlot />
+      {stage ?? <StageSlot />}
       <Hud />
       <MiniMap />
       {toastText && <div className="toast walk-toast" role="status">{toastText}</div>}

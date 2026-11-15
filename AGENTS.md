@@ -56,7 +56,9 @@
 
 ### AR のデモ（`/ar-demo`）
 
-`ar-ebisu-sample`（AR の PoC。仕様は同リポジトリの `docs/reimplementation-guide.md`）を移したもの。トップ（`StageSlot`）にはまだつないでいない。
+`ar-ebisu-sample`（AR の PoC。仕様は同リポジトリの `docs/reimplementation-guide.md`）を移したもの。`ARClient` で `<Frame stage={<ARView … />} />` とし、トップと同じ枠（図鑑・ガチャ・HUD・ミニマップ・BGM・お知らせ）を AR 画面の上に重ねている。枠は `Frame` の `stage` に渡したものを `StageSlot` の代わりに敷く（`.walk.is-ar` のときの置き方は `globals.css` の末尾）。
+
+- デモ用の案内人「おばあちゃん」（`figure: obaachan`）を置いている。元絵は自作の `scripts/obaachan.svg`（左が正面、右が背面）。絵を変えたら sharp で `assets/figures/obaachan.png` に書き出してから `npm run prepare:figure`。タップでクイズを出すつなぎはまだ無い
 
 - 置くものは `src/data/ar-objects.json` で決める。2 段に分かれている
   - `figures`: 素材（見た目）。`views` は面の並び（`["front","back"]` の二面、または `["front","side","back"]` の三面）。元画像は白背景で、左から `views` の順に等幅で並べる
@@ -107,7 +109,7 @@
 ├── public/sw.js         # Service Worker。中身を変えたら VERSION を上げる
 ├── .nvmrc               # ローカル開発の Node.js バージョン（nvm 用）
 ├── assets/figures/      # AR の素材の元画像（白背景。左から views の順）
-├── scripts/             # prepare-figure.mjs（AR の素材生成。npm run prepare:figure）と lib/、icon.svg・make-icons.mjs（PWA のアイコンを作る）
+├── scripts/             # prepare-figure.mjs（AR の素材生成。npm run prepare:figure）と lib/、obaachan.svg（案内人の元絵）、icon.svg・make-icons.mjs（PWA のアイコンを作る）
 ├── public/img/sages/    # 七賢人の肖像（国立国会図書館「近代日本人の肖像」）
 ├── public/figures/      # AR の素材の生成物（<id>/{front,back,side}.png・board.json）
 └── src/
@@ -115,7 +117,7 @@
     ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・GuideQuizDialog・BgmButton・PwaRegister・MiniMap・StageSlot（3D の差し込み場所）
     │   └── ar/          # AR 画面（ARView・SceneObject・FigureBoard・カメラ・位置・デバッグ）
     ├── hooks/           # ブラウザ API の購読（カメラ・端末の向き・位置情報）
-    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）・guide-quiz（案内人の歴史クイズ）・position（今いる場所）
+    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・bgm（自作 BGM）・guide-quiz（案内人の歴史クイズ）・position（今いる場所）・demo（デモ操作）
     │   └── ar/          # AR の純粋関数（angle・geo・facing・behaviors（出方・動き方）・objects（定義の読み込み））
     ├── data/            # 試作から移した JSON（ebisu-catalog / ebisu-demo / characters / chapters / events / ranking-demo）、ar-objects.json、history-quiz.json（案内人の歴史クイズ）
     └── styles/          # tokens.css・components.css（design/ から複製）、frame.css（試作 walk.css から移したもの）、ar.css
