@@ -111,6 +111,7 @@ scripts/            # 素材の生成スクリプト（AR の素材、PWA のア
 ## 出典
 
 - えびす像の写真と位置：© 恵比須DEまちづくりネットワーク（公式サイト「佐賀恵比須」）。写真はリポジトリに保存せず、公式サイトから表示しています。一般に公開する前に、使い方を相談します
+- えびす像の名前：公式の一覧で「名称不明」の像（651 体）には、場所（町名・神社や寺）と縁起のよい言葉から仮の名前を付け、「（仮）」を付けています（`src/data/ebisu-catalog.json` の `tentative: true`）。公式の名前ではありません
 - 七賢人の肖像：国立国会図書館「近代日本人の肖像」
 - AR の表示：[three.js](https://threejs.org/)（MIT）、[React Three Fiber](https://github.com/pmndrs/react-three-fiber)・[drei](https://github.com/pmndrs/drei)（MIT）。素材の生成に [sharp](https://sharp.pixelplumbing.com/)（Apache-2.0）
 - QR コード：[node-qrcode](https://github.com/soldair/node-qrcode)（MIT）
