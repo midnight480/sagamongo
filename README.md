@@ -45,11 +45,18 @@ npm run build
 
 ## デプロイ
 
-Vercel の `midnight480` チームの `sagamongo` プロジェクトにつないであります。
+Vercel の `midnight480` チームの `sagamongo` プロジェクトに、GitHub のリポジトリをつないであります。
+
+| 操作 | デプロイ先 |
+| --- | --- |
+| `main` への push、PR のマージ | 本番（https://sagamongo.vercel.app） |
+| PR を作る・PR のブランチに push | Preview（PR ごとに URL が出る） |
+
+手元から出すこともできます。
 
 ```sh
 vercel            # Preview にデプロイ
-vercel --prod     # 本番（sagamongo.vercel.app）にデプロイ
+vercel --prod     # 本番にデプロイ
 ```
 
 環境変数は `vercel env add` で登録し、ローカルには `vercel env pull .env.local` で落とします。`.env*` はコミットしません。
