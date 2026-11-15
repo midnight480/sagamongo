@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import QRCode from 'qrcode';
 import { QUESTIONS, QUIZ_POINTS } from '@/lib/guide-quiz';
+import { GUIDE_URL } from '@/lib/guide-qr';
 import './print.css';
 
 // 町の案内人（おばあちゃん）に渡す、印刷用の QR コード。
@@ -12,8 +13,6 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-// 印刷物に載せるので、本番の URL に固定する
-const GUIDE_URL = 'https://sagamongo.vercel.app/guide';
 const CARDS = 4;
 
 export default async function GuideQrPage() {

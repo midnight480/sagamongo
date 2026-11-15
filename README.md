@@ -43,7 +43,7 @@ SAGA スマートハッカソン（2026-11-15）で作っているアプリの�
 
 スマホで開いて「AR を開始」を押すと、カメラ映像の先にえびすさんが現れて歩き回ります。歩いて近づいたり、回り込んで後ろ姿を見たりできます（位置は GPS、向きはコンパス）。HTTPS が必要です。PC ではドラッグで見回し、WASD / 矢印キーで歩けます。
 
-AR 画面の上にも、トップと同じ図鑑・ランキング、ガチャ、ポイント表示、ミニマップ、BGM のボタンが出ます。「着いたことにする（デモ）」でポイントを貯めて、そのままガチャを回せます。
+AR 画面の上にも、トップと同じ図鑑・ランキング、ガチャ、ポイント表示、ミニマップ、BGM のボタンが出ます。「着いたことにする（デモ）」でポイントを貯めて、そのままガチャを回せます。「案内人の QR を読む」で、案内人のおばあちゃんの QR コードをアプリの中で読み取ると、歴史クイズが出ます（読めないときのデモ用ボタンもあります）。
 
 - 置くもの（素材・出方・動き方）は `src/data/ar-objects.json` で決めます
 - 素材の画像（白背景、左から正面・背面）を変えたら `npm run prepare:figure` で `public/figures/<id>/` を作り直し、生成物もコミットします
@@ -114,7 +114,7 @@ scripts/            # 素材の生成スクリプト（AR の素材、PWA のア
 - えびす像の名前：公式の一覧で「名称不明」の像（651 体）には、場所（町名・神社や寺）と縁起のよい言葉から仮の名前を付け、「（仮）」を付けています（`src/data/ebisu-catalog.json` の `tentative: true`）。公式の名前ではありません
 - 七賢人の肖像：国立国会図書館「近代日本人の肖像」
 - AR の表示：[three.js](https://threejs.org/)（MIT）、[React Three Fiber](https://github.com/pmndrs/react-three-fiber)・[drei](https://github.com/pmndrs/drei)（MIT）。素材の生成に [sharp](https://sharp.pixelplumbing.com/)（Apache-2.0）
-- QR コード：[node-qrcode](https://github.com/soldair/node-qrcode)（MIT）
+- QR コード：作成に [node-qrcode](https://github.com/soldair/node-qrcode)（MIT）、読み取りに [jsQR](https://github.com/cozmo/jsQR)（Apache-2.0）
 
 ## エージェント向け
 
