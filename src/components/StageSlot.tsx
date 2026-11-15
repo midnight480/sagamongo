@@ -12,23 +12,10 @@
 //   lapArrive(chapter, id)      周回の像に着いた
 // ポイントの値は lib/rarity.ts の GRADES[grade].statuePoints など。お知らせは lib/ui-store.ts の toast(text)。
 
-import * as progress from '@/lib/progress';
-import { toast } from '@/lib/ui-store';
-import { gradeOf } from '@/lib/rarity';
-import { catalogEntries } from '@/lib/catalog';
+import { arriveRandom } from '@/lib/demo';
 
 export function StageSlot() {
   // デモ用：3D がまだないので、ランダムなえびす像に「着いた」ことにするボタンを置く
-  const arriveRandom = () => {
-    const located = catalogEntries.filter((e) => e.located && !progress.has(e.key));
-    const e = located[Math.floor(Math.random() * located.length)];
-    if (!e) return;
-    const pts = gradeOf(e.grade).statuePoints;
-    progress.collect(e.key, e.name, pts);
-    progress.visit(e.key, e.name, 20);
-    toast(`【${e.grade}】${e.name}に着きました！（デモ）`);
-  };
-
   return (
     <section className="stage-slot" aria-label="AR の画面（3D 担当が作る場所）">
       <p className="stage-slot-title">ここに「えびすさんが歩く」AR 画面が入ります</p>
