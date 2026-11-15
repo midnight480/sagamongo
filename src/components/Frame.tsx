@@ -12,6 +12,9 @@ import { Hud } from './Hud';
 import { GachaDialog } from './GachaDialog';
 import { BookDialog } from './BookDialog';
 import { JoinDialog } from './JoinDialog';
+import { GuideQuizDialog } from './GuideQuizDialog';
+import * as guideQuiz from '@/lib/guide-quiz';
+import { param } from '@/lib/params';
 import { StageSlot } from './StageSlot';
 import { MiniMap } from './MiniMap';
 import { BgmButton } from './BgmButton';
@@ -30,6 +33,12 @@ export function Frame({ stage }: { stage?: ReactNode } = {}) {
   // ガチャの演出（効果音）が聞こえるよう、ガチャを開いているあいだは BGM を小さくする
   useEffect(() => bgm.setDuck(open === 'gacha'), [open]);
   const cls = ar ? 'walk is-ar' : 'walk';
+  // 発表用：?quiz=okuma などで、開いたときにその案内人のクイズを出す（?quiz=1 なら、まだ正解していない問題から）
+  useEffect(() => {
+    if (!mounted) return;
+    const id = param('quiz');
+    if (id) guideQuiz.meetGuide(id === '1' ? undefined : id);
+  }, [mounted]);
   if (!mounted) return <main className={cls} aria-busy="true" />;
 
   return (
@@ -55,6 +64,7 @@ export function Frame({ stage }: { stage?: ReactNode } = {}) {
       <BookDialog open={open === 'book'} onClose={() => setOpen(null)} />
       <GachaDialog open={open === 'gacha'} onClose={() => setOpen(null)} />
       <JoinDialog />
+      <GuideQuizDialog />
     </main>
   );
 }
