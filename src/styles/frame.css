@@ -309,3 +309,25 @@
 .walk-quiz-choices .btn.is-wrong { background: var(--color-danger); color: var(--color-surface); border-color: var(--color-danger); }
 .walk-quiz-choices .btn.is-removed { opacity: 0.35; text-decoration: line-through; }
 .walk-quiz-choices .btn:disabled.is-correct { opacity: 1; }
+
+/* ---------- 記念撮影（移植元：試作 walk.css） ---------- */
+.selfie-frame { position: relative; }
+.selfie-canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: 56dvh;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  touch-action: none;
+  cursor: grab;
+}
+.selfie-flash { position: absolute; inset: 0; border-radius: var(--radius-md); background: #ffffff; opacity: 0; pointer-events: none; }
+.selfie-flash.is-on { animation: selfie-flash 400ms ease-out; }
+@keyframes selfie-flash { from { opacity: 0.95; } to { opacity: 0; } }
+.selfie-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: var(--space-2) 0; }
+.selfie-tools .walk-demo-note { flex: 1 1 100%; margin: 0; }
+.selfie-check { display: flex; gap: var(--space-2); align-items: center; }
+.selfie-shoot { width: 100%; margin-top: var(--space-2); font-size: var(--font-size-md); font-weight: 700; }
+.selfie-photo { display: block; width: 100%; border-radius: var(--radius-md); }
+@media (prefers-reduced-motion: reduce) { .selfie-flash.is-on { animation: none; } }
