@@ -1,0 +1,43 @@
+{
+  "board": {
+    "thicknessM": 0.04,
+    "rimM": 0.05,
+    "minRimM": 0.015,
+    "bevelM": 0.006,
+    "maxVertices": 48
+  },
+  "figures": [
+    {
+      "id": "ebisu",
+      "name": "えびすさん",
+      "heightM": 1.2,
+      "source": "assets/figures/ebisu.png",
+      "views": ["front", "back"]
+    }
+  ],
+  "objects": [
+    {
+      "id": "ebisu-walk",
+      "figure": "ebisu",
+      "label": "えびすさん",
+      "spawn": { "type": "ahead", "distanceM": [5, 8], "spreadDeg": 15 },
+      "motion": {
+        "type": "wander",
+        "radiusM": 8,
+        "speedMps": 0.35,
+        "turnIntervalS": 5,
+        "pauseProbability": 0.3,
+        "pauseS": [1.5, 3],
+        "minDistanceM": 0.8,
+        "turnTimeConstantS": 0.6
+      }
+    },
+    {
+      "id": "ebisu-stay",
+      "figure": "ebisu",
+      "label": "立ち止まるえびすさん",
+      "spawn": { "type": "ahead", "distanceM": [9, 12], "spreadDeg": 25 },
+      "motion": { "type": "stay" }
+    }
+  ]
+}

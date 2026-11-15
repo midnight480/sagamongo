@@ -32,6 +32,13 @@ SAGA スマートハッカソン（2026-11-15）で作っているアプリの�
 
 3D 部分ができるまでは、画面中央の「どこかのえびす像に着いたことにする（デモ）」で、像を集めたことにできます。
 
+### AR のデモ（`/ar-demo`）
+
+スマホで開いて「AR を開始」を押すと、カメラ映像の先にえびすさんが現れて歩き回ります。歩いて近づいたり、回り込んで後ろ姿を見たりできます（位置は GPS、向きはコンパス）。HTTPS が必要です。PC ではドラッグで見回し、WASD / 矢印キーで歩けます。
+
+- 置くもの（素材・出方・動き方）は `src/data/ar-objects.json` で決めます
+- 素材の画像（白背景、左から正面・背面）を変えたら `npm run prepare:figure` で `public/figures/<id>/` を作り直し、生成物もコミットします
+
 ## 開発
 
 Node.js 24 で動かします。
@@ -68,9 +75,12 @@ src/
 ├── app/            # Next.js（App Router）のページとレイアウト
 ├── components/     # 画面の部品（HUD・図鑑・ガチャ・七賢人・3D の差し込み場所）
 ├── lib/            # ロジック（記録、レア度、ガチャ、イベント、データの組み立て）
-├── data/           # えびす像・七賢人・エリア・イベントなどの JSON（試作から移したもの）
+├── data/           # えびす像・七賢人・エリア・イベントなどの JSON（試作から移したもの）、AR に置くもの
 └── styles/         # デザイントークンと部品のスタイル
 public/img/sages/   # 七賢人の肖像写真
+public/figures/     # AR の素材（npm run prepare:figure の生成物）
+assets/figures/     # AR の素材の元画像
+scripts/            # 素材の生成スクリプト
 ```
 
 ## 記録とプライバシー
@@ -83,6 +93,7 @@ public/img/sages/   # 七賢人の肖像写真
 
 - えびす像の写真と位置：© 恵比須DEまちづくりネットワーク（公式サイト「佐賀恵比須」）。写真はリポジトリに保存せず、公式サイトから表示しています。一般に公開する前に、使い方を相談します
 - 七賢人の肖像：国立国会図書館「近代日本人の肖像」
+- AR の表示：[three.js](https://threejs.org/)（MIT）、[React Three Fiber](https://github.com/pmndrs/react-three-fiber)・[drei](https://github.com/pmndrs/drei)（MIT）。素材の生成に [sharp](https://sharp.pixelplumbing.com/)（Apache-2.0）
 
 ## エージェント向け
 
