@@ -79,6 +79,17 @@ function ac() {
   if (audio.state === 'suspended') audio.resume();
   return audio;
 }
+// すべての音はここを通す。大きな音（SSR）が重なっても割れないよう、最後にコンプレッサーをかける
+let out = null;
+function dest(a) {
+  if (!out) {
+    const comp = a.createDynamicsCompressor();
+    comp.threshold.value = -16; comp.knee.value = 12; comp.ratio.value = 4;
+    out = a.createGain(); out.gain.value = 0.9;
+    out.connect(comp).connect(a.destination);
+  }
+  return out;
+}
 function tone(freq, dur, { type = 'square', vol = 0.08, at = 0, slide = 0 } = {}) {
   const a = ac(); if (!a) return;
   const t = a.currentTime + at;
@@ -86,7 +97,7 @@ function tone(freq, dur, { type = 'square', vol = 0.08, at = 0, slide = 0 } = {}
   o.type = type; o.frequency.setValueAtTime(freq, t);
   if (slide) o.frequency.exponentialRampToValueAtTime(freq * slide, t + dur);
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur);
+  o.connect(g).connect(dest(a)); o.start(t); o.stop(t + dur);
 }
 function noise(dur, { vol = 0.3, at = 0, hp = 800 } = {}) {
   const a = ac(); if (!a) return;
@@ -97,12 +108,48 @@ function noise(dur, { vol = 0.3, at = 0, hp = 800 } = {}) {
   const s = a.createBufferSource(); s.buffer = buf;
   const f = a.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = hp;
   const g = a.createGain(); g.gain.value = vol;
-  s.connect(f).connect(g).connect(a.destination); s.start(t);
+  s.connect(f).connect(g).connect(dest(a)); s.start(t);
 }
+// 楽器らしい音：立ち上がり（attack）、2本を少しずらして厚く（detune, cent）、
+// 明るさの変化（lp → lpEnd のローパス）、ビブラート（vib：周波数に対する揺れの割合）
+function voice(freq, dur, { type = 'triangle', vol = 0.08, at = 0, attack = 0.01, detune = 0, lp = 0, lpEnd = 0, vib = 0 } = {}) {
+  const a = ac(); if (!a) return;
+  const t = a.currentTime + at;
+  const g = a.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + attack);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  let input = g;
+  if (lp) {
+    const f = a.createBiquadFilter(); f.type = 'lowpass';
+    f.frequency.setValueAtTime(lp, t);
+    if (lpEnd) f.frequency.exponentialRampToValueAtTime(lpEnd, t + dur);
+    f.connect(g); input = f;
+  }
+  for (const d of detune ? [-detune, detune] : [0]) {
+    const o = a.createOscillator(); o.type = type; o.frequency.setValueAtTime(freq, t); o.detune.value = d;
+    if (vib) {
+      const lfo = a.createOscillator(); lfo.frequency.value = 5.5;
+      const depth = a.createGain(); depth.gain.value = freq * vib;
+      lfo.connect(depth).connect(o.frequency); lfo.start(t); lfo.stop(t + dur + 0.05);
+    }
+    o.connect(input); o.start(t); o.stop(t + dur + 0.05);
+  }
+  g.connect(dest(a));
+}
+// MIDI の音の番号 → 周波数（60 = ド C4、72 = C5）
+const hz = (n) => 440 * 2 ** ((n - 69) / 12);
+const boom = (at, vol) => tone(58, 0.8, { type: 'sine', slide: 0.45, vol, at }); // ティンパニ風の「ドーン」
+const crash = (at, vol) => noise(1.4, { vol, at, hp: 4500 }); // シンバル
+const snare = (at, vol) => noise(0.14, { vol, at, hp: 1200 });
+// 和音を一度に鳴らす
+const chord = (notes, dur, opts) => notes.forEach((n) => voice(hz(n), dur, opts));
+
 const sound = {
   crank: (at) => { noise(0.06, { vol: 0.25, at, hp: 2000 }); tone(180, 0.05, { at, vol: 0.05 }); },
   drop: () => { tone(500, 0.12, { type: 'triangle', slide: 0.5, vol: 0.12 }); tone(300, 0.1, { type: 'triangle', at: 0.15, slide: 0.6, vol: 0.08 }); },
-  pop: () => { noise(0.35, { vol: 0.6, hp: 300 }); tone(90, 0.25, { type: 'sine', slide: 0.4, vol: 0.3 }); },
+  // カプセルが開く「パン！」。強さ k（0〜1）はレア度で変える
+  pop: (k = 1) => { noise(0.35, { vol: 0.6 * k, hp: 300 }); tone(90, 0.25, { type: 'sine', slide: 0.4, vol: 0.3 * k }); },
   sparkle: (n) => { for (let i = 0; i < n; i++) tone(1200 + i * 180, 0.25, { type: 'sine', at: 0.08 * i + 0.15, vol: 0.05 }); },
   // 予告：機械が光るときの「キュイーン」
   hint: () => tone(300, 0.9, { type: 'sawtooth', slide: 4, vol: 0.05 }),
@@ -116,15 +163,53 @@ const sound = {
   thunder: () => { noise(0.5, { vol: 0.5, hp: 200 }); noise(0.15, { vol: 0.4, hp: 3000 }); tone(70, 0.6, { type: 'sine', slide: 0.5, vol: 0.3 }); },
   // 開けるのを待つあいだのドラムロール（SR 以上）
   roll: (sec) => { for (let t = 0; t < sec; t += 0.07) noise(0.05, { vol: 0.08 + (t / sec) * 0.12, at: t, hp: 1500 }); },
-  // レア度ごとのジングル
+  // レア度ごとのジングル。N → R → SR → SSR の順に、高く・明るく・音が多く・速く・長く・激しくなる
+  //   N  ：やわらかい三角波で「ポロン」と 2 音（ソ→ド）。小さく短い
+  //   R  ：ド・ミ・ソと上がって、オクターブ上のきらめきが重なる
+  //   SR ：駆け上がり → 明るい和音のファンファーレ。ドーンとシンバル
+  //   SSR：2 オクターブを一気に駆け上がり → 3 回の決め打ち → 大きな和音を長く伸ばし、きらきらが降る。ドーン・シンバルも何度も
   jingle: {
-    N: () => tone(660, 0.18, { type: 'triangle', at: 0.15, vol: 0.08 }),
-    R: () => [659, 880].forEach((f, i) => tone(f, 0.22, { type: 'triangle', at: 0.15 + i * 0.12, vol: 0.09 })),
-    SR: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, i === 3 ? 0.6 : 0.2, { type: 'triangle', at: 0.15 + i * 0.12, vol: 0.1 })),
+    N: () => {
+      [67, 72].forEach((n, i) => voice(hz(n), 0.22, { type: 'triangle', at: 0.15 + i * 0.12, vol: 0.07, lp: 1800 }));
+    },
+    R: () => {
+      [72, 76, 79].forEach((n, i) => {
+        voice(hz(n), i === 2 ? 0.5 : 0.18, { type: 'triangle', at: 0.15 + i * 0.09, vol: 0.09 });
+        voice(hz(n + 12), i === 2 ? 0.5 : 0.18, { type: 'sine', at: 0.15 + i * 0.09, vol: 0.035 });
+      });
+      [91, 96].forEach((n, i) => voice(hz(n), 0.3, { type: 'sine', at: 0.45 + i * 0.07, vol: 0.03 }));
+    },
+    SR: () => {
+      [72, 76, 79, 84].forEach((n, i) =>
+        voice(hz(n), 0.14, { type: 'square', at: 0.15 + i * 0.07, vol: 0.05, lp: 3200, detune: 6 }));
+      snare(0.38, 0.18); snare(0.45, 0.22);
+      const at = 0.5;
+      chord([84, 88, 91], 1.1, { type: 'sawtooth', at, vol: 0.045, attack: 0.02, lp: 2200, lpEnd: 5500, detune: 8, vib: 0.004 });
+      chord([96], 1.1, { type: 'sine', at, vol: 0.04, vib: 0.004 });
+      boom(at, 0.32); crash(at, 0.18);
+      [96, 100, 103, 108].forEach((n, i) => voice(hz(n), 0.25, { type: 'sine', at: at + 0.2 + i * 0.08, vol: 0.025 }));
+    },
     SSR: () => {
-      [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(f, 0.2, { type: 'square', at: 0.15 + i * 0.1, vol: 0.06 }));
-      [523, 659, 784].forEach((f) => tone(f * 2, 1.2, { type: 'triangle', at: 0.8, vol: 0.07 })); // 最後に和音
-      tone(55, 0.8, { type: 'sine', vol: 0.3 }); // ドーン
+      // 2 オクターブの駆け上がり（明るいヨナ抜き）
+      const run = [72, 74, 76, 79, 81, 84, 86, 88, 91, 93, 96];
+      run.forEach((n, i) => voice(hz(n), 0.12, { type: 'square', at: 0.12 + i * 0.045, vol: 0.04, lp: 4500, detune: 5 }));
+      for (let t = 0.3; t < 0.62; t += 0.05) snare(t, 0.1 + (t - 0.3) * 0.6);
+      // 決め打ち 3 回（ソ → ラ → ド）
+      const stabs = [[0.65, [79, 83, 86]], [0.85, [81, 84, 88]], [1.05, [83, 86, 89]]];
+      stabs.forEach(([at, notes]) => {
+        chord(notes, 0.16, { type: 'sawtooth', at, vol: 0.05, lp: 3500, detune: 10 });
+        boom(at, 0.3); snare(at, 0.2);
+      });
+      crash(0.65, 0.25);
+      // 大きな和音を長く伸ばす（ド・ミ・ソ・ド）
+      const at = 1.3;
+      chord([72, 84, 88, 91, 96], 1.8, { type: 'sawtooth', at, vol: 0.045, attack: 0.03, lp: 2500, lpEnd: 8000, detune: 12, vib: 0.006 });
+      chord([100, 103], 1.8, { type: 'sine', at, vol: 0.03, vib: 0.006 });
+      tone(hz(48), 1.4, { type: 'sine', at, vol: 0.25 }); // 低いド
+      boom(at, 0.45); crash(at, 0.32); crash(at + 0.9, 0.15);
+      // きらきらが降る
+      const sparkle = [108, 103, 100, 96, 103, 100, 96, 91];
+      for (let i = 0; i < 20; i++) voice(hz(sparkle[i % sparkle.length]), 0.22, { type: 'sine', at: at + 0.15 + i * 0.065, vol: 0.022 });
     },
   },
 };
@@ -233,7 +318,7 @@ function openCap(resolve) {
   stage.quake = f.shake ? 0.8 : 0;
   stage.words.push({ text: f.word, x: W / 2, y: 60, t: performance.now(), big: f.size });
   if (grade === 'SSR') stage.words.push({ text: 'SSR！！', x: W / 2, y: 115, t: performance.now() + 250, big: 34 });
-  sound.pop();
+  sound.pop({ N: 0.5, R: 0.7, SR: 0.9, SSR: 1 }[grade]);
   sound.jingle[grade]();
   sound.sparkle({ N: 2, R: 4, SR: 6, SSR: 9 }[grade]);
   navigator.vibrate?.({ N: 30, R: [30, 40, 30], SR: [40, 60, 80], SSR: [60, 40, 60, 40, 200] }[grade]);
