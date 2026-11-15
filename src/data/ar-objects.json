@@ -13,13 +13,6 @@
       "heightM": 1.2,
       "source": "assets/figures/ebisu.png",
       "views": ["front", "back"]
-    },
-    {
-      "id": "obaachan",
-      "name": "案内人のおばあちゃん",
-      "heightM": 1.45,
-      "source": "assets/figures/obaachan.png",
-      "views": ["front", "back"]
     }
   ],
   "objects": [
@@ -44,13 +37,6 @@
       "figure": "ebisu",
       "label": "立ち止まるえびすさん",
       "spawn": { "type": "ahead", "distanceM": [9, 12], "spreadDeg": 25 },
-      "motion": { "type": "stay" }
-    },
-    {
-      "id": "guide-obaachan",
-      "figure": "obaachan",
-      "label": "案内人のおばあちゃん（デモ）",
-      "spawn": { "type": "ahead", "distanceM": [4, 6], "spreadDeg": 35 },
       "motion": { "type": "stay" }
     }
   ]
