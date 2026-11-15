@@ -49,6 +49,7 @@
 - 記録は `src/lib/progress.ts` に集める。3D 側は着いた・出会ったときに `collect(key, name, points)`・`visit()`・`awaken()`・`addWalk(m)`・`lapArrive()` を呼ぶ。画面（HUD・図鑑・ガチャ）は記録の変化を受けて自動で描き直す
 - 図鑑の key は `ebisu:<id>`（デモの3体）、`cat:<fid>`（828体の一覧）、`sage:<id>`（七賢人）
 - お知らせは `src/lib/ui-store.ts` の `toast(text)`
+- 右下のミニマップ（`src/components/MiniMap.tsx`）はフレーム側。今いる場所は `src/lib/position.ts` に集める。GPS はミニマップが書き、3D 側がデモの位置（地図を押してそこに立ったことにする、など）を出すときは `setPosition(lat, lng, 'demo')` を呼ぶ
 - 「見に行く」（地図の道案内）は 3D／地図側の担当。`BookDialog` の `onGo(fid)` で外に渡す
 
 ## 関連リポジトリ
@@ -72,7 +73,7 @@
 - フレームワーク: Next.js 16（App Router）+ React 19 + TypeScript
 - ホスティング: Vercel（Fluid Compute、Node.js 24）
 - ローカル開発: Node.js 26.12.0（`.nvmrc` に指定。`nvm use` で切り替える）
-- 地図（3D 側で使う予定）: Leaflet（タイルは国土地理院）、徒歩ルートは OpenStreetMap
+- 地図: Leaflet 1.9.4（タイルは地理院タイル。出典を地図の隅に出す）、徒歩ルートは OpenStreetMap
 - 公開先: https://sagamongo.vercel.app（Vercel の `midnight480` チーム、プロジェクト名 `sagamongo`）
 - 設定ファイル: `vercel.ts`（`@vercel/config`）
 
@@ -88,8 +89,8 @@
 ├── public/img/sages/    # 七賢人の肖像（国立国会図書館「近代日本人の肖像」）
 └── src/
     ├── app/             # ページとレイアウト（layout.tsx / page.tsx / globals.css）
-    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・StageSlot（3D の差し込み場所）
-    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store
+    ├── components/      # Frame（枠）・Hud・GachaDialog・BookDialog・JoinDialog・Thumb・MiniMap・StageSlot（3D の差し込み場所）
+    ├── lib/             # progress（記録）・rarity・gacha・gacha-fx（演出）・events・catalog（データの組み立て）・ui-store・position（今いる場所）
     ├── data/            # 試作から移した JSON（ebisu-catalog / ebisu-demo / characters / chapters / events / ranking-demo）
     └── styles/          # tokens.css・components.css（design/ から複製）、frame.css（試作 walk.css から移したもの）
 ```

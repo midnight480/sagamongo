@@ -10,6 +10,7 @@ import { GachaDialog } from './GachaDialog';
 import { BookDialog } from './BookDialog';
 import { JoinDialog } from './JoinDialog';
 import { StageSlot } from './StageSlot';
+import { MiniMap } from './MiniMap';
 
 type Open = null | 'book' | 'gacha';
 
@@ -33,6 +34,7 @@ export function Frame() {
 
       <StageSlot />
       <Hud />
+      <MiniMap />
       {toastText && <div className="toast walk-toast" role="status">{toastText}</div>}
 
       <BookDialog open={open === 'book'} onClose={() => setOpen(null)} />
