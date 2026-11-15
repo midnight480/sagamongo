@@ -92,9 +92,9 @@
       "grade": "N",
       "portrait": {
         "src": "img/sages/shima.jpg",
-        "cx": 0.497,
-        "cy": 0.36,
-        "ry": 0.095,
+        "cx": 0.5,
+        "cy": 0.357,
+        "ry": 0.19,
         "flip": false,
         "credit": "出典：北海道大学附属図書館 北方資料室所蔵（1868年ごろの写真。Wikimedia Commons、パブリックドメイン）",
         "url": "https://commons.wikimedia.org/wiki/File:Shima_Yoshitake.jpg"
